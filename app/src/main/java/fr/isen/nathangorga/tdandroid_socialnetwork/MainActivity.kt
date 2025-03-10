@@ -4,42 +4,53 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.*
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
 import fr.isen.nathangorga.tdandroid_socialnetwork.ui.theme.TDAndroidSocialNetworkTheme
+import fr.isen.nathangorga.tdandroid_socialnetwork.ui.theme.LoginScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        FirebaseApp.initializeApp(this)
+
         setContent {
             TDAndroidSocialNetworkTheme {
-                MainScreen()
+                val navController = rememberNavController()
+                val auth = remember { FirebaseAuth.getInstance() }
+                val user = auth.currentUser
+
+                if (user != null) {
+                    AppNavigation(navController)
+                } else {
+                    LoginScreen(navController)
+                }
             }
         }
     }
 }
-
 @Composable
-fun MainScreen() {
-    var selectedTab by remember { mutableIntStateOf(0) }
-    val items = listOf("Page1", "Page2", "Page3", "Page4")
+fun AppNavigation(navController: NavHostController) {
+    var selectedTab by remember { mutableStateOf(0) }
+
+    val screens = listOf("Page1", "Page2", "Page3", "Page4")
+    val icons = listOf(
+        R.drawable.ic_launcher_foreground,
+        R.drawable.ic_launcher_foreground,
+        R.drawable.ic_launcher_foreground,
+        R.drawable.ic_launcher_foreground
+    )
 
     Scaffold(
         topBar = {
@@ -48,7 +59,7 @@ fun MainScreen() {
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_launcher_foreground), // Remplace par ton logo
+                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
                     contentDescription = "Logo",
                     modifier = Modifier
                         .size(80.dp)
@@ -58,30 +69,56 @@ fun MainScreen() {
         },
         bottomBar = {
             NavigationBar {
-                items.forEachIndexed { index, item ->
+                screens.forEachIndexed { index, item ->
                     NavigationBarItem(
-                        icon = {
-                            Icon(
-                                painterResource(id = R.drawable.ic_launcher_foreground),
-                                contentDescription = item
-                            )
-                        },
+                        icon = { Icon(painterResource(id = icons[index]), contentDescription = item) },
                         label = { Text(item) },
                         selected = selectedTab == index,
-                        onClick = { selectedTab = index }
+                        onClick = {
+                            selectedTab = index
+                            navController.navigate(item)
+                        }
                     )
                 }
             }
         }
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
-            when (selectedTab) {
-                0 -> Text("page1", Modifier.align(Alignment.Center))
-                1 -> Text("page2", Modifier.align(Alignment.Center))
-                2 -> Text("page3", Modifier.align(Alignment.Center))
-                3 -> Text("page4", Modifier.align(Alignment.Center))
+            NavHost(navController, startDestination = "Page1") {
+                composable("Page1") { Page1Screen() }
+                composable("Page2") { Page2Screen() }
+                composable("Page3") { Page3Screen() }
+                composable("Page4") { Page4Screen() }
             }
         }
+    }
+}
+
+@Composable
+fun Page1Screen() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text("Page 1")
+    }
+}
+
+@Composable
+fun Page2Screen() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text("Page 2")
+    }
+}
+
+@Composable
+fun Page3Screen() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text("Page 3")
+    }
+}
+
+@Composable
+fun Page4Screen() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text("Page 4")
     }
 }
 
@@ -89,6 +126,7 @@ fun MainScreen() {
 @Composable
 fun PreviewMainScreen() {
     TDAndroidSocialNetworkTheme {
-        MainScreen()
+        val navController = rememberNavController()
+        AppNavigation(navController)
     }
 }
