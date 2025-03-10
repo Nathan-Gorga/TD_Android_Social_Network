@@ -14,8 +14,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -25,12 +27,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import fr.isen.nathangorga.tdandroid_socialnetwork.R
+import fr.isen.nathangorga.tdandroid_socialnetwork.ui.theme.DarkBlue
 import fr.isen.nathangorga.tdandroid_socialnetwork.ui.theme.TDAndroidSocialNetworkTheme
 
 class ProfileEditActivity : ComponentActivity() {
@@ -55,9 +58,7 @@ fun ProfileEditScreen() {
     )
     pfp.intValue = imageMap[user.profilePictureName] ?: R.drawable.ic_launcher_foreground
 
-    var username by remember { mutableStateOf(TextFieldValue(user.username)) }
-    var firstName by remember { mutableStateOf(TextFieldValue(user.firstName)) }
-    var lastName by remember { mutableStateOf(TextFieldValue(user.lastName)) }
+
     val profilePicture by remember { mutableIntStateOf(pfp.intValue) }
 
     Column(
@@ -93,6 +94,7 @@ fun ProfileEditScreen() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomTextField(label: String, initialValue: String) {
     var text by remember { mutableStateOf(initialValue) }
@@ -102,6 +104,15 @@ fun CustomTextField(label: String, initialValue: String) {
         value = text,
         onValueChange = { text = it },
         label = { Text(label) },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            // textColor = Color.Blue, // Couleur du texte
+            focusedBorderColor = DarkBlue, // Bordure quand focus
+            unfocusedBorderColor = Color.Gray, // Bordure quand pas focus
+            //cursorColor = Color.Red, // Couleur du curseur
+            focusedLabelColor = DarkBlue, // Couleur du label quand focus
+            unfocusedLabelColor = Color.Gray // Couleur du label sans focus
+
+        ),
         modifier = Modifier
             .fillMaxWidth()
             .onFocusChanged { focusState ->
@@ -116,6 +127,7 @@ fun CustomTextField(label: String, initialValue: String) {
                     }
                     isFocused = false
                 }
+
             }
     )
 }
