@@ -39,6 +39,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
     var selectedTab by remember { mutableIntStateOf(0) }
+    //                  Accueil, Post   , Search  , Profil
     val items = listOf("Page1", "Page2", "Page3", "Page4")
 
     Scaffold(
