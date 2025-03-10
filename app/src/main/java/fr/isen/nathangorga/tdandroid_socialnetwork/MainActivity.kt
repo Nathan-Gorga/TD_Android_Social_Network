@@ -1,88 +1,124 @@
 package fr.isen.nathangorga.tdandroid_socialnetwork
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Article
+import androidx.compose.material.icons.filled.Publish
+import androidx.compose.material.icons.filled.Help
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.*
+import androidx.navigation.compose.rememberNavController
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
 import fr.isen.nathangorga.tdandroid_socialnetwork.ui.theme.TDAndroidSocialNetworkTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        FirebaseApp.initializeApp(this)
+
         setContent {
             TDAndroidSocialNetworkTheme {
-                MainScreen()
+                val navController = rememberNavController()
+                val auth = remember { FirebaseAuth.getInstance() }
+                val user = auth.currentUser
+
+                if (user != null) {
+                    AppNavigation(navController)
+                } else {
+                    val context = this
+                    val intent = Intent(context, LogActivity::class.java)
+                    context.startActivity(intent)
+                }
             }
         }
     }
 }
 
 @Composable
-fun MainScreen() {
-    var selectedTab by remember { mutableIntStateOf(0) }
-    //                  Accueil, Post   , Search  , Profil
-    val items = listOf("Page1", "Page2", "Page3", "Page4")
+
+fun AppNavigation(navController: NavHostController) {
+    var selectedTab by remember { mutableStateOf(0) }
+
+    val screens = listOf("journal", "publier", "plusTard", "profil")
+    val labels = listOf("Journal", "Publier", "Plus tard", "Mon profil")
+    val icons = listOf(
+        Icons.Filled.Article,  // Icône article pour "Journal"
+        Icons.Filled.Publish,  // Icône publication pour "Publier"
+        Icons.Filled.Help,     // Icône aide pour "Plus tard"
+        Icons.Filled.Person    // Icône profil pour "Mon profil"
+    )
+
 
     Scaffold(
-        topBar = {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_launcher_foreground), // Remplace par ton logo
-                    contentDescription = "Logo",
-                    modifier = Modifier
-                        .size(80.dp)
-                        .padding(8.dp)
-                )
-            }
-        },
         bottomBar = {
-            NavigationBar {
-                items.forEachIndexed { index, item ->
+            NavigationBar(
+                containerColor = Color(0xFFB3E5FC), // Bleu plus clair
+                modifier = Modifier.height(110.dp)
+            ) {
+                screens.forEachIndexed { index, route ->
                     NavigationBarItem(
-                        icon = {
-                            Icon(
-                                painterResource(id = R.drawable.ic_launcher_foreground),
-                                contentDescription = item
-                            )
-                        },
-                        label = { Text(item) },
+                        icon = { Icon(imageVector = icons[index], contentDescription = labels[index], tint = Color.Black) },
+                        label = { Text(labels[index], color = Color.Black) },
                         selected = selectedTab == index,
-                        onClick = { selectedTab = index }
+                        onClick = {
+                            selectedTab = index
+                            navController.navigate(route)
+                        }
                     )
                 }
             }
         }
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
-            when (selectedTab) {
-                0 -> Text("page1", Modifier.align(Alignment.Center))
-                1 -> Text("page2", Modifier.align(Alignment.Center))
-                2 -> Text("page3", Modifier.align(Alignment.Center))
-                3 -> Text("page4", Modifier.align(Alignment.Center))
+            NavHost(navController, startDestination = "journal") {
+                composable("journal") { Page1Screen() }
+                composable("publier") { Page2Screen() }
+                composable("plusTard") { Page3Screen() }
+                composable("profil") { Page4Screen() }
             }
         }
+    }
+}
+
+@Composable
+fun Page1Screen() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text("Page Journal")
+    }
+}
+
+@Composable
+fun Page2Screen() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text("Page Publier")
+    }
+}
+
+@Composable
+fun Page3Screen() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text("Page Plus tard")
+    }
+}
+
+@Composable
+fun Page4Screen() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text("Page Profil")
     }
 }
 
@@ -90,6 +126,7 @@ fun MainScreen() {
 @Composable
 fun PreviewMainScreen() {
     TDAndroidSocialNetworkTheme {
-        MainScreen()
+        val navController = rememberNavController()
+        AppNavigation(navController)
     }
 }

@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "669912155460",
+    "firebase_url": "https://papybook-7d857-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "papybook-7d857",
+    "storage_bucket": "papybook-7d857.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:669912155460:android:61850bb97e7d11f76a0311",
+        "android_client_info": {
+          "package_name": "fr.isen.nathangorga.tdandroid_socialnetwork"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbzVV2A0pc1HJYdTav5dFobMJHgXAlBsk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

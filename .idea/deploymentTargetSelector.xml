@@ -4,6 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
+
       </SelectionState>
       <SelectionState runConfigName="ProfileEditActivity">
         <option name="selectionMode" value="DROPDOWN" />
@@ -19,6 +20,7 @@
       </SelectionState>
       <SelectionState runConfigName="ProfileEditActivity (2)">
         <option name="selectionMode" value="DROPDOWN" />
+
       </SelectionState>
     </selectionStates>
   </component>
