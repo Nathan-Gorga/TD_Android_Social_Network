@@ -49,6 +49,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
+
 fun AppNavigation(navController: NavHostController) {
     var selectedTab by remember { mutableStateOf(0) }
 
@@ -60,6 +61,7 @@ fun AppNavigation(navController: NavHostController) {
         Icons.Filled.Help,     // Icône aide pour "Plus tard"
         Icons.Filled.Person    // Icône profil pour "Mon profil"
     )
+
 
     Scaffold(
         bottomBar = {
