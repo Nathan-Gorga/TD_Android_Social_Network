@@ -1,5 +1,6 @@
 package fr.isen.nathangorga.tdandroid_socialnetwork
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,10 +15,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
+import androidx.navigation.compose.rememberNavController
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import fr.isen.nathangorga.tdandroid_socialnetwork.ui.theme.TDAndroidSocialNetworkTheme
-import fr.isen.nathangorga.tdandroid_socialnetwork.ui.theme.LoginScreen
+//import fr.isen.nathangorga.tdandroid_socialnetwork.ui.theme.LoginScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +36,9 @@ class MainActivity : ComponentActivity() {
                 if (user != null) {
                     AppNavigation(navController)
                 } else {
-                    LoginScreen(navController)
+                    val context = this
+                    val intent = Intent(context, LogActivity::class.java)
+                    context.startActivity(intent)
                 }
             }
         }
