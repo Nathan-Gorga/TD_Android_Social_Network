@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -23,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
@@ -32,7 +34,6 @@ import fr.isen.nathangorga.tdandroid_socialnetwork.R
 import fr.isen.nathangorga.tdandroid_socialnetwork.ui.theme.TDAndroidSocialNetworkTheme
 
 class ProfileEditActivity : ComponentActivity() {
-    //TODO: ajouter navbar et navigation
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -44,25 +45,22 @@ class ProfileEditActivity : ComponentActivity() {
 }
 
 @Composable
-fun ProfileEditScreen() {//TODO: afficher les éléments à changer
+fun ProfileEditScreen() {
+    val user = UserProfile.getFakeUser()
 
-    val user = UserProfile.getFakeUser()//remplacer par requete BDD
-
-    //Ce bloc est uniquement un test, les images sont en locales. À supprimer lorsque les images seront sur la BDD
-    val PFP = remember { mutableIntStateOf(R.drawable.ic_launcher_foreground) }
+    val pfp = remember { mutableIntStateOf(R.drawable.ic_launcher_foreground) }
     val imageMap = mapOf(
-        "default_profile_picture.png" to R.drawable.default_profile_picture,  // Exemple de correspondance
+        "default_profile_picture.png" to R.drawable.default_profile_picture,
         "pfp_jean.png" to R.drawable.pfp_jean
     )
-    PFP.intValue = imageMap[user.profilePictureName] ?: R.drawable.ic_launcher_foreground
-
+    pfp.intValue = imageMap[user.profilePictureName] ?: R.drawable.ic_launcher_foreground
 
     var username by remember { mutableStateOf(TextFieldValue(user.username)) }
     var firstName by remember { mutableStateOf(TextFieldValue(user.firstName)) }
     var lastName by remember { mutableStateOf(TextFieldValue(user.lastName)) }
-    val profilePicture by remember { mutableIntStateOf(PFP.intValue) } // Remplace par une photo de profil par défaut
+    val profilePicture by remember { mutableIntStateOf(pfp.intValue) }
 
-    Column(//TODO: choisir un meilleur Layout
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
@@ -80,35 +78,48 @@ fun ProfileEditScreen() {//TODO: afficher les éléments à changer
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedTextField(
-            value = username,
-            onValueChange = { username = it },
-            label = { Text("Nom d'utilisateur") }
-        )
-
+        CustomTextField("Nom d'utilisateur", initialValue = user.username)
         Spacer(modifier = Modifier.height(8.dp))
 
-        OutlinedTextField(
-            value = firstName,
-            onValueChange = { firstName = it },
-            label = { Text("Prénom") }
-        )
-
+        CustomTextField("Prénom", initialValue = user.firstName)
         Spacer(modifier = Modifier.height(8.dp))
 
-        OutlinedTextField(
-            value = lastName,
-            onValueChange = { lastName = it },
-            label = { Text("Nom") }
-        )
-
+        CustomTextField("Nom", initialValue = user.lastName)
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = { /* Sauvegarder les modifications */ }) {//TODO: vérifier qu'il n'y a pas de conflits et sauvegarder sur la BDD
+        Button(onClick = { /* Sauvegarder les modifications */ }) {
             Text("Enregistrer")
         }
     }
 }
+
+@Composable
+fun CustomTextField(label: String, initialValue: String) {
+    var text by remember { mutableStateOf(initialValue) }
+    var isFocused by remember { mutableStateOf(false) }
+
+    OutlinedTextField(
+        value = text,
+        onValueChange = { text = it },
+        label = { Text(label) },
+        modifier = Modifier
+            .fillMaxWidth()
+            .onFocusChanged { focusState ->
+                if (focusState.isFocused) {
+                    if (!isFocused && (initialValue == text)) {
+                        text = ""
+                    }
+                    isFocused = true
+                } else {
+                    if (text.isBlank()) {
+                        text = initialValue
+                    }
+                    isFocused = false
+                }
+            }
+    )
+}
+
 
 
 @Preview(showBackground = true)
