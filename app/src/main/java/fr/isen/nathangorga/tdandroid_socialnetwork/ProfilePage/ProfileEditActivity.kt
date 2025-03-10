@@ -82,6 +82,9 @@ fun ProfileEditScreen() {
         CustomTextField("Nom d'utilisateur", initialValue = user.username)
         Spacer(modifier = Modifier.height(8.dp))
 
+        CustomTextField("Courriel", initialValue = user.email)
+        Spacer(modifier = Modifier.height(8.dp))
+
         CustomTextField("Prénom", initialValue = user.firstName)
         Spacer(modifier = Modifier.height(8.dp))
 
