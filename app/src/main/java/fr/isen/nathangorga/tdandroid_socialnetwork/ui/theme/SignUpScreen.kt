@@ -1,13 +1,8 @@
 package fr.isen.nathangorga.tdandroid_socialnetwork.ui.theme
 
-
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,7 +41,7 @@ fun SignUpScreen(navController: NavController) {
                     if (task.isSuccessful) {
                         message = "Inscription réussie !"
                         Toast.makeText(context, "Inscription réussie !", Toast.LENGTH_SHORT).show()
-                        navController.navigate("home")
+                        navController.navigate("home") // 🔥 Redirige après inscription
                     } else {
                         message = task.exception?.message ?: "Erreur inconnue"
                     }
@@ -57,7 +52,7 @@ fun SignUpScreen(navController: NavController) {
         Text(text = message, color = Color.Red)
         Spacer(modifier = Modifier.height(8.dp))
         TextButton(onClick = { navController.navigate("login") }) {
-            Text("Déjà un compte ? Connecte-toi ici")
+            Text("Déjà inscrit ? Connecte-toi ici")
         }
     }
 }
