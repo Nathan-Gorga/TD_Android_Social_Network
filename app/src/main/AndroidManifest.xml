@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ProfileEditActivity"
+            android:name=".ProfilePage.ProfileEditActivity"
             android:exported="true"
             android:theme="@style/Theme.TDAndroidSocialNetwork">
 

@@ -1,4 +1,4 @@
-package fr.isen.nathangorga.tdandroid_socialnetwork
+package fr.isen.nathangorga.tdandroid_socialnetwork.ProfilePage
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -28,9 +28,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import fr.isen.nathangorga.tdandroid_socialnetwork.R
 import fr.isen.nathangorga.tdandroid_socialnetwork.ui.theme.TDAndroidSocialNetworkTheme
 
 class ProfileEditActivity : ComponentActivity() {
+    //TODO: ajouter navbar et navigation
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -42,13 +44,25 @@ class ProfileEditActivity : ComponentActivity() {
 }
 
 @Composable
-fun ProfileEditScreen() {
-    var username by remember { mutableStateOf(TextFieldValue("")) }
-    var firstName by remember { mutableStateOf(TextFieldValue("")) }
-    var lastName by remember { mutableStateOf(TextFieldValue("")) }
-    val profilePicture by remember { mutableIntStateOf(R.drawable.ic_launcher_foreground) } // Remplace par une vraie image
+fun ProfileEditScreen() {//TODO: afficher les éléments à changer
 
-    Column(
+    val user = UserProfile.getFakeUser()//remplacer par requete BDD
+
+    //Ce bloc est uniquement un test, les images sont en locales. À supprimer lorsque les images seront sur la BDD
+    val PFP = remember { mutableIntStateOf(R.drawable.ic_launcher_foreground) }
+    val imageMap = mapOf(
+        "default_profile_picture.png" to R.drawable.default_profile_picture,  // Exemple de correspondance
+        "pfp_jean.png" to R.drawable.pfp_jean
+    )
+    PFP.intValue = imageMap[user.profilePictureName] ?: R.drawable.ic_launcher_foreground
+
+
+    var username by remember { mutableStateOf(TextFieldValue(user.username)) }
+    var firstName by remember { mutableStateOf(TextFieldValue(user.firstName)) }
+    var lastName by remember { mutableStateOf(TextFieldValue(user.lastName)) }
+    val profilePicture by remember { mutableIntStateOf(PFP.intValue) } // Remplace par une photo de profil par défaut
+
+    Column(//TODO: choisir un meilleur Layout
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
@@ -90,11 +104,12 @@ fun ProfileEditScreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = { /* Sauvegarder les modifications */ }) {
+        Button(onClick = { /* Sauvegarder les modifications */ }) {//TODO: vérifier qu'il n'y a pas de conflits et sauvegarder sur la BDD
             Text("Enregistrer")
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
