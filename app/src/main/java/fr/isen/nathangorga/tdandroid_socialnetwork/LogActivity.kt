@@ -58,13 +58,11 @@ fun LoginScreen(navController: NavController) {
         contentAlignment = Alignment.TopCenter
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Spacer(modifier = Modifier.height(16.dp))
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Logo",
-                modifier = Modifier.size(400.dp)
+                modifier = Modifier.size(380.dp)
             )
-            Spacer(modifier = Modifier.height(8.dp))
 
             Box(
                 modifier = Modifier
@@ -141,20 +139,15 @@ fun SignUpScreen(navController: NavController) {
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
-            .padding(16.dp),
+            .padding(8.dp),
         contentAlignment = Alignment.TopCenter
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Spacer(modifier = Modifier.height(16.dp))
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Logo",
-                modifier = Modifier
-                    .size(350.dp), // Augmente la taille
-                contentScale = ContentScale.Fit // Adapte l’image
+                modifier = Modifier.size(380.dp), // Augmente la taille
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
 
             Box(
                 modifier = Modifier
@@ -189,8 +182,7 @@ fun SignUpScreen(navController: NavController) {
                             auth.createUserWithEmailAndPassword(email, password)
                                 .addOnCompleteListener { task ->
                                     if (task.isSuccessful) {
-                                        context.startActivity(Intent(context, MainActivity::class.java))
-                                        (context as? ComponentActivity)?.finish()
+                                        navController.navigate("LoginScreen")
                                     } else {
                                         errorMessage = task.exception?.message ?: "Échec de l'inscription."
                                     }

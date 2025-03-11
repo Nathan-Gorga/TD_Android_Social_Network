@@ -1,9 +1,11 @@
 package fr.isen.nathangorga.tdandroid_socialnetwork
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -40,6 +42,7 @@ import fr.isen.nathangorga.tdandroid_socialnetwork.PublishScreen
 
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -63,6 +66,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 
 fun AppNavigation(navController: NavHostController) {
@@ -100,7 +104,7 @@ fun AppNavigation(navController: NavHostController) {
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             NavHost(navController, startDestination = "journal") {
-                composable("journal") { Page1Screen() }
+                composable("journal") { JournalView(navController) }
                 composable("publier") { PublishScreen(navController) }
                 composable("plusTard") { Page3Screen() }
                 composable("profil") { ProfileEditScreen() }
@@ -145,3 +149,5 @@ fun PreviewMainScreen() {
         AppNavigation(navController)
     }
 }
+
+
