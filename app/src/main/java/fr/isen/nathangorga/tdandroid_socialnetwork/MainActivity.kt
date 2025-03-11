@@ -7,6 +7,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Article
 import androidx.compose.material.icons.filled.Publish
@@ -90,6 +94,7 @@ fun AppNavigation(navController: NavHostController) {
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             NavHost(navController, startDestination = "journal") {
+
                 composable("journal") { FeedScreen(navController) } // Fil d'actualité
                 composable("publier") { PublishScreen(navController) }
                 composable("plusTard") { Page3Screen() }
@@ -138,3 +143,5 @@ fun PreviewMainScreen() {
         AppNavigation(navController)
     }
 }
+
+
