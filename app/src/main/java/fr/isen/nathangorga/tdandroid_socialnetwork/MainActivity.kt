@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Article
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.Article
 import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.Person
@@ -36,6 +38,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
+import fr.isen.nathangorga.tdandroid_socialnetwork.login.LogActivity
+import fr.isen.nathangorga.tdandroid_socialnetwork.profile.ProfileEditScreen
 import fr.isen.nathangorga.tdandroid_socialnetwork.ui.theme.TDAndroidSocialNetworkTheme
 
 
@@ -68,14 +72,14 @@ class MainActivity : ComponentActivity() {
 @Composable
 
 fun AppNavigation(navController: NavHostController) {
-    var selectedTab by remember { mutableStateOf(0) }
+    var selectedTab by remember { mutableIntStateOf(0) }
 
     val screens = listOf("journal", "publier", "plusTard", "profile")
     val labels = listOf("Journal", "Publier", "Plus tard", "Mon profil")
     val icons = listOf(
-        Icons.Filled.Article,  // Icône article pour "Journal"
+        Icons.AutoMirrored.Filled.Article,  // Icône article pour "Journal"
         Icons.Filled.Publish,  // Icône publication pour "Publier"
-        Icons.Filled.Help,     // Icône aide pour "Plus tard"
+        Icons.AutoMirrored.Filled.Help,     // Icône aide pour "Plus tard"
         Icons.Filled.Person    // Icône profil pour "Mon profil"
     )
 
@@ -93,7 +97,14 @@ fun AppNavigation(navController: NavHostController) {
                         selected = selectedTab == index,
                         onClick = {
                             selectedTab = index
-                            navController.navigate(route)
+                            // On passe l'ID utilisateur si on navigue vers l'écran "profil"
+                            if (route == "profil") {
+                                val userId =
+                                    FirebaseAuth.getInstance().currentUser?.uid ?: "no_user"
+                                navController.navigate("profil/$userId")
+                            } else {
+                                navController.navigate(route)
+                            }
                         }
                     )
                 }
