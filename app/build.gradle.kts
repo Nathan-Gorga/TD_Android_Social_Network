@@ -41,6 +41,9 @@ android {
     buildFeatures {
         compose = true
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.3"
+    }
 }
 
 dependencies {
@@ -50,24 +53,19 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
+    implementation(libs.androidx.material.icons.extended)
     implementation("io.coil-kt:coil-compose:2.1.0")
-    implementation("androidx.compose.material:material-icons-extended:1.5.4")
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.runtime.android)
-    implementation ("com.google.firebase:firebase-database-ktx")
-    ("org.webrtc:google-webrtc:1.0.32006")
-    implementation ("com.google.firebase:firebase-database:20.2.2") // Firebase pour stocker les signaux
     //implementation(libs.androidx.navigation.runtime.desktop)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.firebase.database.ktx)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.protolite.well.known.types)
-    implementation(libs.firebase.storage.ktx)
-    implementation(libs.firebase.vertexai)
-    implementation(libs.generativeai)
-
+    implementation(libs.firebase.common.ktx)
+    implementation(libs.support.annotations)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -75,5 +73,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation(libs.firebase.bom)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.coil.compose)
+    implementation(libs.androidx.activity.compose.v182)
+
 }
