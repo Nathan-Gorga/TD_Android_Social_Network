@@ -99,6 +99,11 @@ fun AppNavigation(navController: NavHostController) {
                 composable("publier") { PublishScreen(navController) }
                 composable("plusTard") { Page3Screen() }
                 composable("profil") { Page4Screen() }
+                composable("commentScreen/{articleId}") { backStackEntry ->
+                    val articleId = backStackEntry.arguments?.getString("articleId") ?: ""
+                    CommentScreen(articleId, navController)
+                }
+
             }
         }
     }

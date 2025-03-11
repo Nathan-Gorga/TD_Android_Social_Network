@@ -8,6 +8,6 @@ data class Article(
     val imageUrl: String? = null,
     val date: String = "",
     val likes: Int = 0,
-    val comments: List<Comment> = emptyList(),
+    var comments: Map<String, Comment>? = emptyMap(),
 )
 
