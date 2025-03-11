@@ -1,6 +1,8 @@
 package fr.isen.nathangorga.tdandroid_socialnetwork
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.util.Base64
@@ -9,18 +11,42 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -31,6 +57,7 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import fr.isen.nathangorga.tdandroid_socialnetwork.login.LogActivity
 
 data class UserProfile(
     val userId: String = "",
@@ -75,6 +102,22 @@ fun ProfileScreen(navController: NavHostController) {
                 .padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0xFFF5F5F5)) // Fond gris clair
+                    .padding(16.dp),
+                contentAlignment = Alignment.TopEnd // Aligner tous les éléments en haut à droite
+            ) {
+                Button(
+
+                    onClick = { logout(context) },
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    Text("Déconnexion")
+                }
+            }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
@@ -213,6 +256,21 @@ fun encodeImageToBase64(uri: Uri, context: Context): String? {
 }
 */
 // Fonction pour décoder un Base64 en Bitmap
+
+fun logout(context: Context) {
+    FirebaseAuth.getInstance().signOut()
+
+    // Create an intent to navigate to LogActivity
+    val intent = Intent(context, LogActivity::class.java)
+    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+    context.startActivity(intent)
+
+    // Finish the current activity if context is an Activity
+    if (context is Activity) {
+        context.finish()
+    }
+}
+
 fun decodeBase64ToBitmap(base64: String): android.graphics.Bitmap? {
     return try {
         val decodedBytes = Base64.decode(base64, Base64.DEFAULT)
