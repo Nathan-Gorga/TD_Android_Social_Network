@@ -23,6 +23,8 @@ import androidx.navigation.compose.rememberNavController
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import fr.isen.nathangorga.tdandroid_socialnetwork.ui.theme.TDAndroidSocialNetworkTheme
+import fr.isen.nathangorga.tdandroid_socialnetwork.PublishScreen
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,7 +88,7 @@ fun AppNavigation(navController: NavHostController) {
         Box(modifier = Modifier.padding(innerPadding)) {
             NavHost(navController, startDestination = "journal") {
                 composable("journal") { Page1Screen() }
-                composable("publier") { Page2Screen() }
+                composable("publier") { PublishScreen(navController) }
                 composable("plusTard") { Page3Screen() }
                 composable("profil") { Page4Screen() }
             }
