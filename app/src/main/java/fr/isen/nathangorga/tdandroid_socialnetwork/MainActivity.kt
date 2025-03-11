@@ -34,7 +34,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
-import fr.isen.nathangorga.tdandroid_socialnetwork.ProfilePage.ProfileEditScreen
+import fr.isen.nathangorga.tdandroid_socialnetwork.login.LogActivity
+import fr.isen.nathangorga.tdandroid_socialnetwork.profile.ProfileEditScreen
 import fr.isen.nathangorga.tdandroid_socialnetwork.ui.theme.TDAndroidSocialNetworkTheme
 
 class MainActivity : ComponentActivity() {
@@ -62,7 +63,6 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-
 fun AppNavigation(navController: NavHostController) {
     var selectedTab by remember { mutableIntStateOf(0) }
 
@@ -74,7 +74,6 @@ fun AppNavigation(navController: NavHostController) {
         Icons.AutoMirrored.Filled.Help,     // Icône aide pour "Plus tard"
         Icons.Filled.Person    // Icône profil pour "Mon profil"
     )
-
 
     Scaffold(
         bottomBar = {
@@ -89,7 +88,14 @@ fun AppNavigation(navController: NavHostController) {
                         selected = selectedTab == index,
                         onClick = {
                             selectedTab = index
-                            navController.navigate(route)
+                            // On passe l'ID utilisateur si on navigue vers l'écran "profil"
+                            if (route == "profil") {
+                                val userId =
+                                    FirebaseAuth.getInstance().currentUser?.uid ?: "no_user"
+                                navController.navigate("profil/$userId")
+                            } else {
+                                navController.navigate(route)
+                            }
                         }
                     )
                 }
@@ -101,11 +107,16 @@ fun AppNavigation(navController: NavHostController) {
                 composable("journal") { Page1Screen() }
                 composable("publier") { Page2Screen() }
                 composable("plusTard") { Page3Screen() }
-                composable("profil") { ProfileEditScreen() }
+                // Modification ici pour accepter un argument userId
+                composable("profil/{userId}") { backStackEntry ->
+                    val userId = backStackEntry.arguments?.getString("userId") ?: "no_user"
+                    ProfileEditScreen(userId = userId) // Passer userId à fr.isen.nathangorga.tdandroid_socialnetwork.profile.ProfileEditScreen
+                }
             }
         }
     }
 }
+
 
 @Composable
 fun Page1Screen() {

@@ -1,5 +1,7 @@
-package fr.isen.nathangorga.tdandroid_socialnetwork.ProfilePage
+package fr.isen.nathangorga.tdandroid_socialnetwork.profile
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -7,6 +9,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,10 +32,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.firebase.auth.FirebaseAuth
 import fr.isen.nathangorga.tdandroid_socialnetwork.R
+import fr.isen.nathangorga.tdandroid_socialnetwork.login.LogActivity
 import fr.isen.nathangorga.tdandroid_socialnetwork.ui.theme.DarkBlue
 import fr.isen.nathangorga.tdandroid_socialnetwork.ui.theme.TDAndroidSocialNetworkTheme
 
@@ -41,14 +47,20 @@ class ProfileEditActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             TDAndroidSocialNetworkTheme {
-                ProfileEditScreen()
+                val user = FirebaseAuth.getInstance().currentUser
+                val userId = user?.uid
+                if (userId != null) {
+                    ProfileEditScreen(userId = userId)
+                }
             }
         }
     }
 }
 
 @Composable
-fun ProfileEditScreen() {
+fun ProfileEditScreen(userId: String) { // Pass context as a parameter
+    //TODO: remplacer fake user par un user de firebase
+    //À SUPPRIMER CE BLOC
     val user = UserProfile.getFakeUser()
 
     val pfp = remember { mutableIntStateOf(R.drawable.ic_launcher_foreground) }
@@ -58,9 +70,8 @@ fun ProfileEditScreen() {
     )
     pfp.intValue = imageMap[user.profilePictureName] ?: R.drawable.ic_launcher_foreground
 
-
     val profilePicture by remember { mutableIntStateOf(pfp.intValue) }
-
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -68,6 +79,20 @@ fun ProfileEditScreen() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Text("Profil de l'utilisateur : $userId")
+        // Bouton de déconnexion en haut à droite
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            Button(
+                onClick = { logout(context = context) }, // Pass context to fr.isen.nathangorga.tdandroid_socialnetwork.profile.Logout
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Text("Déconnexion")
+            }
+        }
+
         Image(
             painter = painterResource(id = profilePicture),
             contentDescription = "Photo de profil",
@@ -107,14 +132,11 @@ fun CustomTextField(label: String, initialValue: String) {
         value = text,
         onValueChange = { text = it },
         label = { Text(label) },
-        colors = TextFieldDefaults.outlinedTextFieldColors(
-            // textColor = Color.Blue, // Couleur du texte
-            focusedBorderColor = DarkBlue, // Bordure quand focus
-            unfocusedBorderColor = Color.Gray, // Bordure quand pas focus
-            //cursorColor = Color.Red, // Couleur du curseur
+        colors = TextFieldDefaults.colors( // Remplace outlinedTextFieldColors() par colors()
+            focusedIndicatorColor = DarkBlue, // Bordure quand focus
+            unfocusedIndicatorColor = Color.Gray, // Bordure quand pas focus
             focusedLabelColor = DarkBlue, // Couleur du label quand focus
             unfocusedLabelColor = Color.Gray // Couleur du label sans focus
-
         ),
         modifier = Modifier
             .fillMaxWidth()
@@ -130,17 +152,24 @@ fun CustomTextField(label: String, initialValue: String) {
                     }
                     isFocused = false
                 }
-
             }
     )
 }
 
+fun logout(context: Context) {
+    FirebaseAuth.getInstance().signOut()
 
+    // Rediriger vers l'écran de connexion
+    val intent = Intent(context, LogActivity::class.java)
+    intent.flags =
+        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK // Empêche de revenir en arrière avec le bouton retour
+    context.startActivity(intent)
+}
 
 @Preview(showBackground = true)
 @Composable
 fun PreviewProfileEditScreen() {
     TDAndroidSocialNetworkTheme {
-        ProfileEditScreen()
+        ProfileEditScreen(userId = "preview_user_id")
     }
 }

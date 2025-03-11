@@ -1,5 +1,7 @@
 [versions]
+activityComposeVersion = "1.8.2"
 agp = "8.8.0"
+coilCompose = "2.4.0"
 firebaseBom = "33.10.0"
 kotlin = "2.0.0"
 coreKtx = "1.15.0"
@@ -10,6 +12,9 @@ lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.1"
 composeBom = "2024.04.01"
 firebase = "4.4.2"
+material3 = "1.3.1"
+material3Version = "1.2.0"
+materialIconsExtended = "1.7.8"
 navigationRuntimeAndroid = "2.9.0-alpha07"
 navigationRuntimeDesktop = "2.9.0-alpha07"
 navigationCompose = "2.8.8"
@@ -17,9 +22,17 @@ firebaseDatabaseKtx = "21.0.0"
 firebaseAuthKtx = "23.2.0"
 protoliteWellKnownTypes = "18.0.0"
 firebaseCommonKtx = "21.0.0"
+ui = "1.7.8"
+uiTooling = "1.7.8"
+uiToolingPreview = "1.7.8"
 
 [libraries]
+androidx-activity-compose-v182 = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleRuntimeKtx" }
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
+androidx-material3-v120 = { module = "androidx.compose.material3:material3", version.ref = "material3Version" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -38,8 +51,12 @@ androidx-navigation-runtime-android = { group = "androidx.navigation", name = "n
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 firebase-database-ktx = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
 firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
+material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 protolite-well-known-types = { group = "com.google.firebase", name = "protolite-well-known-types", version.ref = "protoliteWellKnownTypes" }
 firebase-common-ktx = { group = "com.google.firebase", name = "firebase-common-ktx", version.ref = "firebaseCommonKtx" }
+ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
+ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "uiTooling" }
+ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

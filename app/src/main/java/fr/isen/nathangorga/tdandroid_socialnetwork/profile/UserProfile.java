@@ -1,14 +1,16 @@
-package fr.isen.nathangorga.tdandroid_socialnetwork.ProfilePage;
+package fr.isen.nathangorga.tdandroid_socialnetwork.profile;
 
 
 public class UserProfile {
+    private String userId;
     private String username;
     private String email;
     private String firstName;
     private String lastName;
     private String profilePictureName;//nom de l'image dans la BDD
 
-    public UserProfile(String username, String email, String firstName, String lastName, String profilePictureName) {
+    public UserProfile(String userId, String username, String email, String firstName, String lastName, String profilePictureName) {
+        this.userId = userId;
         this.username = username;
         this.email = email;
         this.firstName = firstName;
@@ -17,7 +19,15 @@ public class UserProfile {
     }
 
     public static UserProfile getFakeUser() {
-        return new UserProfile("papy123", "jeandupont@gmail.com", "Jean", "Dupont", "pfp_jean.png");
+        return new UserProfile("1", "papy123", "jeandupont@gmail.com", "Jean", "Dupont", "pfp_jean.png");
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getUsername() {
