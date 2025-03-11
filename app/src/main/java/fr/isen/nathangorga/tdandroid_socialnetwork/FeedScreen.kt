@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -39,9 +40,7 @@ fun FeedScreen(navController: NavHostController) {
                     article?.let { articles.add(it) }
                 }
             }
-            override fun onCancelled(error: DatabaseError) {
-                // Gérer l'erreur
-            }
+            override fun onCancelled(error: DatabaseError) {}
         })
     }
 
@@ -63,7 +62,7 @@ fun FeedScreen(navController: NavHostController) {
 
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             items(articles.reversed()) { article ->
-                ArticleCard(article, databaseRef)
+                ArticleCard(article, databaseRef, navController)
                 Spacer(modifier = Modifier.height(10.dp))
             }
         }
@@ -71,7 +70,7 @@ fun FeedScreen(navController: NavHostController) {
 }
 
 @Composable
-fun ArticleCard(article: Article, databaseRef: DatabaseReference) {
+fun ArticleCard(article: Article, databaseRef: DatabaseReference, navController: NavHostController) {
     var likes by remember { mutableStateOf(article.likes ?: 0) }
     var isLiked by remember { mutableStateOf(false) }
 
@@ -152,6 +151,22 @@ fun ArticleCard(article: Article, databaseRef: DatabaseReference) {
                     }
                     Text(text = "$likes", fontSize = 14.sp, fontWeight = FontWeight.Bold)
                 }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = { navController.navigate("commentScreen/${article.id}") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Comment,
+                    contentDescription = "Commentaires",
+                    tint = Color.White
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = "Voir les commentaires", color = Color.White)
             }
         }
     }
