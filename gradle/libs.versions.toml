@@ -16,7 +16,9 @@ navigationCompose = "2.8.8"
 firebaseDatabaseKtx = "21.0.0"
 firebaseAuthKtx = "23.2.0"
 protoliteWellKnownTypes = "18.0.0"
+
 firebaseStorageKtx = "21.0.1"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -39,7 +41,9 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 firebase-database-ktx = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
 firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 protolite-well-known-types = { group = "com.google.firebase", name = "protolite-well-known-types", version.ref = "protoliteWellKnownTypes" }
+
 firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
