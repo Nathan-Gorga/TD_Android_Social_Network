@@ -75,7 +75,7 @@ fun PublishScreen(navController: NavHostController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp),
-                colors = TextFieldDefaults.outlinedTextFieldColors(),
+                //colors = TextFieldDefaults.outlinedTextFieldColors(),
                 shape = RoundedCornerShape(16.dp)
             )
 
