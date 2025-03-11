@@ -18,6 +18,8 @@ firebaseAuthKtx = "23.2.0"
 protoliteWellKnownTypes = "18.0.0"
 
 firebaseStorageKtx = "21.0.1"
+firebaseVertexai = "16.2.0"
+generativeai = "0.9.0"
 
 
 [libraries]
@@ -43,6 +45,8 @@ firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx",
 protolite-well-known-types = { group = "com.google.firebase", name = "protolite-well-known-types", version.ref = "protoliteWellKnownTypes" }
 
 firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
+firebase-vertexai = { group = "com.google.firebase", name = "firebase-vertexai", version.ref = "firebaseVertexai" }
+generativeai = { group = "com.google.ai.client.generativeai", name = "generativeai", version.ref = "generativeai" }
 
 
 [plugins]

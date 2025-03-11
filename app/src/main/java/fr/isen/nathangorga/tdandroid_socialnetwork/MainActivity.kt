@@ -104,6 +104,8 @@ fun AppNavigation(navController: NavHostController) {
     }
 }
 
+
+
 @Composable
 fun Page1Screen() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
