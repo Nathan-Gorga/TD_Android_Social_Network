@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="fr.isen.nathangorga.tdandroid_socialnetwork" />
+                  <option name="mobileSdkAppId" value="1:669912155460:android:61850bb97e7d11f76a0311" />
+                  <option name="projectId" value="papybook-7d857" />
+                  <option name="projectNumber" value="669912155460" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
