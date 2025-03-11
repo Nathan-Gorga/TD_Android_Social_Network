@@ -57,12 +57,16 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.runtime.android)
     implementation ("com.google.firebase:firebase-database-ktx")
+    ("org.webrtc:google-webrtc:1.0.32006")
+    implementation ("com.google.firebase:firebase-database:20.2.2") // Firebase pour stocker les signaux
     //implementation(libs.androidx.navigation.runtime.desktop)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.firebase.database.ktx)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.protolite.well.known.types)
     implementation(libs.firebase.storage.ktx)
+    implementation(libs.firebase.vertexai)
+    implementation(libs.generativeai)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

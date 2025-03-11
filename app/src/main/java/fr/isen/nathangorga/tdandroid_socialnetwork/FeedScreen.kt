@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -46,23 +48,22 @@ fun FeedScreen(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF8F9FA)) // 🔹 Arrière-plan doux
+            .background(Color(0xFFF8F9FA))
             .padding(top = 16.dp)
     ) {
         Text(
             text = "📢 Mon Journal 📢",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center, // Centre le texte
+            textAlign = TextAlign.Center,
             modifier = Modifier
-                .fillMaxWidth() // Étend le texte sur toute la largeur
+                .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         )
 
-
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(articles.reversed()) { article -> // 🔹 Affichage du plus récent au plus ancien
-                ArticleCard(article)
+            items(articles.reversed()) { article ->
+                ArticleCard(article, databaseRef)
                 Spacer(modifier = Modifier.height(10.dp))
             }
         }
@@ -70,7 +71,10 @@ fun FeedScreen(navController: NavHostController) {
 }
 
 @Composable
-fun ArticleCard(article: Article) {
+fun ArticleCard(article: Article, databaseRef: DatabaseReference) {
+    var likes by remember { mutableStateOf(article.likes ?: 0) }
+    var isLiked by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -84,11 +88,10 @@ fun ArticleCard(article: Article) {
                 .padding(16.dp)
                 .fillMaxWidth()
         ) {
-            // 🟦 **Bulle bleue pour le texte**
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFB3E5FC), shape = RoundedCornerShape(12.dp)) // 🔹 Bleu ciel
+                    .background(Color(0xFFB3E5FC), shape = RoundedCornerShape(12.dp))
                     .padding(12.dp)
             ) {
                 Text(
@@ -101,7 +104,6 @@ fun ArticleCard(article: Article) {
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // 📸 **Affichage de l'image si disponible**
             article.imageUrl?.let { imageBase64 ->
                 val decodedBytes = Base64.decode(imageBase64, Base64.DEFAULT)
                 val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
@@ -120,13 +122,37 @@ fun ArticleCard(article: Article) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 🕒 **Date en gris, alignée à droite**
-            Text(
-                text = "Rédiger le  : ${article.date }",
-                fontSize = 12.sp,
-                color = Color.Gray,
-                modifier = Modifier.align(Alignment.End)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Rédigé le : ${article.date}",
+                    fontSize = 12.sp,
+                    color = Color.Gray
+                )
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = {
+                        if (isLiked) {
+                            likes -= 1
+                            isLiked = false
+                        } else {
+                            likes += 1
+                            isLiked = true
+                        }
+                        databaseRef.child(article.id).child("likes").setValue(likes)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Favorite,
+                            contentDescription = "Like",
+                            tint = if (isLiked) Color.Red else Color.Gray
+                        )
+                    }
+                    Text(text = "$likes", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                }
+            }
         }
     }
 }
