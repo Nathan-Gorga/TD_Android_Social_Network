@@ -32,6 +32,9 @@ import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.os.Build
 import android.provider.MediaStore
+import com.google.type.Date
+import java.util.Locale
+import kotlin.text.format
 
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -166,12 +169,14 @@ fun postArticle(text: String, imageUri: Uri?, navController: NavHostController, 
     val databaseRef = FirebaseDatabase.getInstance().getReference("articles")
 
     val imageBase64 = imageUri?.let { encodeImageToBase64(it, context) } // Convertir l'image si elle existe
-
+    val currentDate = java.util.Date()
+    val dateFormat = android . icu . text . SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    val formattedDate = dateFormat.format(currentDate)
     val article = Article(
         id = databaseRef.push().key ?: "",
         text = text,
         imageUrl = imageBase64, // Stockage en Base64
-        timestamp = System.currentTimeMillis()
+        date = formattedDate
     )
 
     databaseRef.child(article.id).setValue(article).addOnCompleteListener {
