@@ -54,6 +54,7 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.material.icons.extended)
+    implementation("io.coil-kt:coil-compose:2.1.0")
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
@@ -73,14 +74,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(platform(libs.firebase.bom))
-
-    implementation(libs.ui)
-    implementation(libs.material3)
     implementation(libs.coil.compose)
     implementation(libs.androidx.activity.compose.v182)
-    implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.ui.tooling.preview)
-    debugImplementation(libs.ui.tooling)
-    implementation(libs.androidx.material3.v120)
 
 }
