@@ -91,11 +91,15 @@ fun CommentScreen(articleId: String, navController: NavHostController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp)), // 🔹 Arrondi
-            colors = TextFieldDefaults.outlinedTextFieldColors(
+            colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color(0xFFB3E5FC), // 🔵 Bleu clair
-                unfocusedBorderColor = Color.Gray
+                unfocusedBorderColor = Color.Gray,
+                cursorColor = Color(0xFFB3E5FC), // 🔵 Curseur
+                focusedLabelColor = Color(0xFFB3E5FC),
+                unfocusedLabelColor = Color.Gray
             )
         )
+
 
         Spacer(modifier = Modifier.height(8.dp))
 
