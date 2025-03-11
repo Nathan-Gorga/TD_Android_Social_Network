@@ -6,25 +6,33 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Article
-import androidx.compose.material.icons.filled.Publish
 import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Publish
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.*
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
@@ -62,7 +70,7 @@ class MainActivity : ComponentActivity() {
 fun AppNavigation(navController: NavHostController) {
     var selectedTab by remember { mutableStateOf(0) }
 
-    val screens = listOf("journal", "publier", "plusTard", "profil")
+    val screens = listOf("journal", "publier", "plusTard", "profile")
     val labels = listOf("Journal", "Publier", "Plus tard", "Mon profil")
     val icons = listOf(
         Icons.Filled.Article,  // Icône article pour "Journal"
@@ -98,7 +106,7 @@ fun AppNavigation(navController: NavHostController) {
                 composable("journal") { FeedScreen(navController) } // Fil d'actualité
                 composable("publier") { PublishScreen(navController) }
                 composable("plusTard") { Page3Screen() }
-                composable("profil") { Page4Screen() }
+                composable("profile") { ProfileScreen(navController) }
             }
         }
     }
