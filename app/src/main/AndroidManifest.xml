@@ -45,14 +45,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".profile.ProfileEditActivity"
-            android:exported="true"
-            android:theme="@style/Theme.TDAndroidSocialNetwork">
-
-        </activity>
-
     </application>
 
 </manifest>
