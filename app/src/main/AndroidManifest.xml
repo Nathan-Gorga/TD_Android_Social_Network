@@ -43,10 +43,7 @@
             android:theme="@style/Theme.TDAndroidSocialNetwork">
 
         </activity>
-        <activity
-            android:name=".login.SignUpActivity"
-            android:exported="true">
-        </activity>
+
     </application>
 
 </manifest>
