@@ -4,5 +4,5 @@ data class Article(
     val id: String = "",
     val text: String = "",
     val imageUrl: String? = null,
-    val timestamp: Long = System.currentTimeMillis()
+    val date: String = "",
 )

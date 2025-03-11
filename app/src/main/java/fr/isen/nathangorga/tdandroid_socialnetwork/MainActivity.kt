@@ -1,9 +1,11 @@
 package fr.isen.nathangorga.tdandroid_socialnetwork
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Article
@@ -23,10 +25,10 @@ import androidx.navigation.compose.rememberNavController
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import fr.isen.nathangorga.tdandroid_socialnetwork.ui.theme.TDAndroidSocialNetworkTheme
-import fr.isen.nathangorga.tdandroid_socialnetwork.PublishScreen
 
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -50,6 +52,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 
 fun AppNavigation(navController: NavHostController) {
@@ -87,7 +90,7 @@ fun AppNavigation(navController: NavHostController) {
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             NavHost(navController, startDestination = "journal") {
-                composable("journal") { Page1Screen() }
+                composable("journal") { FeedScreen(navController) } // Fil d'actualité
                 composable("publier") { PublishScreen(navController) }
                 composable("plusTard") { Page3Screen() }
                 composable("profil") { Page4Screen() }
@@ -124,6 +127,7 @@ fun Page4Screen() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Preview(showBackground = true)
 @Composable
 fun PreviewMainScreen() {
