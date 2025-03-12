@@ -6,32 +6,17 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Article
-import androidx.compose.material.icons.automirrored.filled.Help
-import androidx.compose.material.icons.filled.Article
-import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Publish
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -40,9 +25,9 @@ import androidx.navigation.compose.rememberNavController
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import fr.isen.nathangorga.tdandroid_socialnetwork.login.LogActivity
-import fr.isen.nathangorga.tdandroid_socialnetwork.profile.ProfileEditScreen
+import fr.isen.nathangorga.tdandroid_socialnetwork.model.UserProfileDetailScreen
+import fr.isen.nathangorga.tdandroid_socialnetwork.profile.SearchUserScreen
 import fr.isen.nathangorga.tdandroid_socialnetwork.ui.theme.TDAndroidSocialNetworkTheme
-
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.P)
@@ -63,6 +48,7 @@ class MainActivity : ComponentActivity() {
                     val context = this
                     val intent = Intent(context, LogActivity::class.java)
                     context.startActivity(intent)
+                    finish()
                 }
             }
         }
@@ -71,19 +57,17 @@ class MainActivity : ComponentActivity() {
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-
 fun AppNavigation(navController: NavHostController) {
-    var selectedTab by remember { mutableIntStateOf(0) }
+    var selectedTab by remember { mutableStateOf(0) }
 
-    val screens = listOf("journal", "publier", "plusTard", "profile")
-    val labels = listOf("Journal", "Publier", "Plus tard", "Mon profil")
+    val screens = listOf("journal", "publier", "recherche", "profile")
+    val labels = listOf("Journal", "Publier", "Recherche", "Mon profil")
     val icons = listOf(
         Icons.AutoMirrored.Filled.Article,  // Icône article pour "Journal"
         Icons.Filled.Publish,  // Icône publication pour "Publier"
-        Icons.AutoMirrored.Filled.Help,     // Icône aide pour "Plus tard"
+        Icons.Filled.Search,  // Icône recherche pour "Recherche"
         Icons.Filled.Person    // Icône profil pour "Mon profil"
     )
-
 
     Scaffold(
         bottomBar = {
@@ -98,11 +82,9 @@ fun AppNavigation(navController: NavHostController) {
                         selected = selectedTab == index,
                         onClick = {
                             selectedTab = index
-                            // On passe l'ID utilisateur si on navigue vers l'écran "profil"
-                            if (route == "profil") {
-                                val userId =
-                                    FirebaseAuth.getInstance().currentUser?.uid ?: "no_user"
-                                navController.navigate("profil/$userId")
+                            val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+                            if (route == "profile" && currentUserId != null) {
+                                navController.navigate("profile/$currentUserId")
                             } else {
                                 navController.navigate(route)
                             }
@@ -114,59 +96,20 @@ fun AppNavigation(navController: NavHostController) {
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             NavHost(navController, startDestination = "journal") {
-
-                composable("journal") { FeedScreen(navController) } // Fil d'actualité
+                composable("journal") { FeedScreen(navController) }
                 composable("publier") { PublishScreen(navController) }
-                composable("plusTard") { Page3Screen() }
-
-                composable("profile") { ProfileScreen(navController) }
-                composable("commentScreen/{articleId}") { backStackEntry ->
-                    val articleId = backStackEntry.arguments?.getString("articleId") ?: ""
-                    CommentScreen(articleId, navController)
+                composable("recherche") { SearchUserScreen(navController) }
+                composable("userProfileDetail/{userId}") { backStackEntry ->
+                    val userId = backStackEntry.arguments?.getString("userId") ?: ""
+                    UserProfileDetailScreen(userId, navController)
                 }
 
 
+            composable("profile/{userId}") { backStackEntry ->
+                    val userId = backStackEntry.arguments?.getString("userId") ?: ""
+                    ProfileScreen(navController, userId)
+                }
             }
         }
     }
 }
-
-@Composable
-fun Page1Screen() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Page Journal")
-    }
-}
-
-@Composable
-fun Page2Screen() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Page Publier")
-    }
-}
-
-@Composable
-fun Page3Screen() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Page Plus tard")
-    }
-}
-
-@Composable
-fun Page4Screen() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Page Profil")
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.P)
-@Preview(showBackground = true)
-@Composable
-fun PreviewMainScreen() {
-    TDAndroidSocialNetworkTheme {
-        val navController = rememberNavController()
-        AppNavigation(navController)
-    }
-}
-
-

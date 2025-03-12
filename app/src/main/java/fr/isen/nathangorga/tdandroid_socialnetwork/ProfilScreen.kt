@@ -10,7 +10,6 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -35,7 +34,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -57,7 +55,11 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import androidx.compose.foundation.layout.*
+import androidx.compose.ui.graphics.asImageBitmap
+
 import fr.isen.nathangorga.tdandroid_socialnetwork.login.LogActivity
+import fr.isen.nathangorga.tdandroid_socialnetwork.models.Article
 
 data class UserProfile(
     val userId: String = "",
@@ -66,155 +68,203 @@ data class UserProfile(
     val profilePictureBase64: String = ""
 )
 
+
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun ProfileScreen(navController: NavHostController) {
-        val auth = FirebaseAuth.getInstance()
-        val userId = auth.currentUser?.uid ?: return
-        val database = FirebaseDatabase.getInstance().getReference("users").child(userId)
-        val context = LocalContext.current
+fun ProfileScreen(navController: NavHostController, userId: String) {
+    val auth = FirebaseAuth.getInstance()
+    val userId = auth.currentUser?.uid ?: return
+    val database = FirebaseDatabase.getInstance().getReference("users").child(userId)
+    val articlesRef = FirebaseDatabase.getInstance().getReference("articles")
 
-        var username by remember { mutableStateOf("") }
-        var bio by remember { mutableStateOf("") }
-        var profilePictureBase64 by remember { mutableStateOf("") }
-        var imageUri by remember { mutableStateOf<Uri?>(null) }
+    val context = LocalContext.current
+    var username by remember { mutableStateOf("") }
+    var bio by remember { mutableStateOf("") }
+    var profilePictureBase64 by remember { mutableStateOf("") }
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var userArticles by remember { mutableStateOf<List<Article>>(emptyList()) }
 
-        val imagePickerLauncher = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.GetContent(),
-            onResult = { uri -> if (uri != null) imageUri = uri }
-        )
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri -> if (uri != null) imageUri = uri }
+    )
 
-        LaunchedEffect(userId) {
-            database.get().addOnSuccessListener { snapshot ->
-                val userProfile = snapshot.getValue(UserProfile::class.java)
-                if (userProfile != null) {
-                    username = userProfile.username
-                    bio = userProfile.bio
-                    profilePictureBase64 = userProfile.profilePictureBase64
+    // Récupération des informations utilisateur
+    LaunchedEffect(userId) {
+        database.get().addOnSuccessListener { snapshot ->
+            val userProfile = snapshot.getValue(UserProfile::class.java)
+            if (userProfile != null) {
+                username = userProfile.username
+                bio = userProfile.bio
+                profilePictureBase64 = userProfile.profilePictureBase64
+            }
+        }
+    }
+
+    // Récupération des articles postés par l'utilisateur
+    LaunchedEffect(userId) {
+        articlesRef.orderByChild("userId").equalTo(userId).get().addOnSuccessListener { snapshot ->
+            val articlesList = mutableListOf<Article>()
+            for (child in snapshot.children) {
+                val article = child.getValue(Article::class.java)
+                article?.let { articlesList.add(it) }
+            }
+            userArticles = articlesList
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F5F5))
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // **Section Profil**
+        Box(contentAlignment = Alignment.BottomEnd) {
+            Image(
+                painter = if (profilePictureBase64.isNotEmpty()) {
+                    rememberImagePainter(decodeBase64ToBitmap(profilePictureBase64))
+                } else {
+                    rememberImagePainter(R.drawable.default_profile_picture)
+                },
+                contentDescription = "Photo de profil",
+                modifier = Modifier
+                    .size(140.dp)
+                    .clip(CircleShape)
+                    .border(3.dp, Color.Black, CircleShape)
+                    .clickable { imagePickerLauncher.launch("image/*") },
+                contentScale = ContentScale.Crop
+            )
+            IconButton(
+                onClick = { imagePickerLauncher.launch("image/*") },
+                modifier = Modifier
+                    .size(36.dp)
+                    .background(Color.White, CircleShape)
+                    .border(2.dp, Color.Black, CircleShape)
+            ) {
+                Icon(Icons.Filled.Edit, contentDescription = "Modifier", tint = Color.Black)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // **Carte contenant les infos utilisateur**
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(8.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                OutlinedTextField(
+                    value = username,
+                    onValueChange = { username = it },
+                    label = { Text("Nom d'utilisateur") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                OutlinedTextField(
+                    value = bio,
+                    onValueChange = { bio = it },
+                    label = { Text("Description") },
+                    singleLine = false,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // **Boutons Enregistrer & Se Déconnecter**
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(
+                        onClick = {
+                            if (username.isNotBlank() && bio.isNotBlank()) {
+                                saveProfile(userId, username, bio, imageUri, database, context) { base64 ->
+                                    profilePictureBase64 = base64
+                                    Toast.makeText(context, "Profil mis à jour", Toast.LENGTH_SHORT).show()
+                                }
+                            } else {
+                                Toast.makeText(context, "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2575FC)),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Enregistrer", fontWeight = FontWeight.Bold)
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Button(
+                        onClick = { logout(context) },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Déconnexion", fontWeight = FontWeight.Bold)
+                    }
                 }
             }
         }
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFFF5F5F5)) // Fond gris clair
-                .padding(16.dp),
-            contentAlignment = Alignment.Center
-        ) {
+        Spacer(modifier = Modifier.height(20.dp))
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color(0xFFF5F5F5)) // Fond gris clair
-                    .padding(16.dp),
-                contentAlignment = Alignment.TopEnd // Aligner tous les éléments en haut à droite
+        // **Section Articles de l'utilisateur**
+        Text("Mes Articles De Qualités", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        userArticles.forEach { article ->
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(8.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(4.dp)
             ) {
-                Button(
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(article.text, fontSize = 16.sp, fontWeight = FontWeight.Medium)
 
-                    onClick = { logout(context) },
-                    modifier = Modifier.padding(8.dp)
-                ) {
-                    Text("Déconnexion")
-                }
-            }
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp)
-            ) {
-                // Photo de profil
-                Box(contentAlignment = Alignment.BottomEnd) {
-                    Image(
-                        painter = if (profilePictureBase64.isNotEmpty()) {
-                            rememberImagePainter(decodeBase64ToBitmap(profilePictureBase64))
-                        } else {
-                            rememberImagePainter(R.drawable.default_profile_picture)
-                        },
-                        contentDescription = "Photo de profil",
-                        modifier = Modifier
-                            .size(140.dp)
-                            .clip(CircleShape)
-                            .border(3.dp, Color.Black, CircleShape)
-                            .clickable { imagePickerLauncher.launch("image/*") },
-                        contentScale = ContentScale.Crop
-                    )
-                    IconButton(
-                        onClick = { imagePickerLauncher.launch("image/*") },
-                        modifier = Modifier
-                            .size(36.dp)
-                            .background(Color.White, CircleShape)
-                            .border(2.dp, Color.Black, CircleShape)
-                    ) {
-                        Icon(Icons.Filled.Edit, contentDescription = "Modifier", tint = Color.Black)
-                    }
-                }
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Carte contenant les infos utilisateur
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    shape = RoundedCornerShape(16.dp),
-                    elevation = CardDefaults.cardElevation(8.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                        .animateContentSize()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        // Champ Nom d'utilisateur
-                        OutlinedTextField(
-                            value = username,
-                            onValueChange = { username = it },
-                            label = { Text("Nom d'utilisateur", color = Color.Black) },
-                            textStyle = LocalTextStyle.current.copy(color = Color.Black),
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        // Champ Bio
-                        OutlinedTextField(
-                            value = bio,
-                            onValueChange = { bio = it },
-                            label = { Text("Bio", color = Color.Black) },
-                            textStyle = LocalTextStyle.current.copy(color = Color.Black),
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // Bouton de sauvegarde
-                        Button(
-                            onClick = {
-                                if (username.isNotBlank() && bio.isNotBlank()) {
-                                    saveProfile(userId, username, bio, imageUri, database, context) { base64 ->
-                                        profilePictureBase64 = base64
-                                        Toast.makeText(context, "Profil mis à jour", Toast.LENGTH_SHORT).show()
-                                    }
-                                } else {
-                                    Toast.makeText(context, "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show()
-                                }
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2575FC))
-                        ) {
-                            Text("Enregistrer", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
+                    if (!article.imageUrl.isNullOrEmpty()) {
+                        val bitmap = decodeBase64ToBitmap(article.imageUrl!!)
+                        bitmap?.let {
+                            Image(
+                                bitmap = it.asImageBitmap(),
+                                contentDescription = "Image de l'article",
+                                modifier = Modifier.fillMaxWidth().height(200.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                            )
                         }
                     }
                 }
             }
         }
     }
+}
 
 
-    // Fonction pour enregistrer le profil utilisateur avec Base64
+
+// Fonction pour décoder une image Base64
+fun decodeBase64ToBitmap(base64: String): android.graphics.Bitmap? {
+    return try {
+        val decodedBytes = Base64.decode(base64, Base64.DEFAULT)
+        android.graphics.BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+    } catch (e: Exception) {
+        null
+    }
+}
+
+// Fonction pour enregistrer le profil utilisateur avec Base64
 @RequiresApi(Build.VERSION_CODES.P)
 fun saveProfile(
     userId: String,
@@ -234,7 +284,7 @@ fun saveProfile(
     }
 }
 /*
-// Fonction pour convertir une image en Base64
+Fonction pour convertir une image en Base64
 @RequiresApi(Build.VERSION_CODES.P)
 fun encodeImageToBase64(uri: Uri, context: Context): String? {
     return try {
@@ -255,7 +305,6 @@ fun encodeImageToBase64(uri: Uri, context: Context): String? {
     }
 }
 */
-// Fonction pour décoder un Base64 en Bitmap
 
 fun logout(context: Context) {
     FirebaseAuth.getInstance().signOut()
@@ -268,14 +317,5 @@ fun logout(context: Context) {
     // Finish the current activity if context is an Activity
     if (context is Activity) {
         context.finish()
-    }
-}
-
-fun decodeBase64ToBitmap(base64: String): android.graphics.Bitmap? {
-    return try {
-        val decodedBytes = Base64.decode(base64, Base64.DEFAULT)
-        android.graphics.BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
-    } catch (e: Exception) {
-        null
     }
 }

@@ -3,6 +3,10 @@ package fr.isen.nathangorga.tdandroid_socialnetwork
 import android.content.Context
 import android.net.Uri
 import android.util.Base64
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.os.Build
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -25,16 +29,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import fr.isen.nathangorga.tdandroid_socialnetwork.models.Article
 import java.io.ByteArrayOutputStream
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
-import android.os.Build
-import android.provider.MediaStore
-import com.google.type.Date
-import java.util.Locale
-import kotlin.text.format
+import java.text.SimpleDateFormat
+import java.util.*
 
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,7 +75,6 @@ fun PublishScreen(navController: NavHostController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp),
-                //colors = TextFieldDefaults.outlinedTextFieldColors(),
                 shape = RoundedCornerShape(16.dp)
             )
 
@@ -169,17 +168,31 @@ fun postArticle(text: String, imageUri: Uri?, navController: NavHostController, 
     val databaseRef = FirebaseDatabase.getInstance().getReference("articles")
 
     val imageBase64 = imageUri?.let { encodeImageToBase64(it, context) } // Convertir l'image si elle existe
-    val currentDate = java.util.Date()
-    val dateFormat = android . icu . text . SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    val currentDate = Date()
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
     val formattedDate = dateFormat.format(currentDate)
+
+    // ✅ Récupérer l'ID de l'utilisateur connecté
+    val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+
+    // ✅ Vérification si l'utilisateur est bien connecté
+    if (currentUserId.isEmpty()) {
+        println("⚠️ Erreur : Aucun utilisateur connecté")
+        return
+    }
+
     val article = Article(
         id = databaseRef.push().key ?: "",
         text = text,
         imageUrl = imageBase64, // Stockage en Base64
-        date = formattedDate
+        date = formattedDate,
+        userId = currentUserId // 🔥 Enregistrer l'ID de l'utilisateur 🔥
     )
 
     databaseRef.child(article.id).setValue(article).addOnCompleteListener {
+        println("✅ Article publié avec succès : ${article.id}")
         navController.navigate("journal") // Redirection après publication
+    }.addOnFailureListener {
+        println("❌ Erreur lors de la publication : ${it.message}")
     }
 }
