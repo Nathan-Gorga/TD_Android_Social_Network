@@ -234,7 +234,7 @@ fun saveProfile(
     }
 }
 /*
-// Fonction pour convertir une image en Base64
+Fonction pour convertir une image en Base64
 @RequiresApi(Build.VERSION_CODES.P)
 fun encodeImageToBase64(uri: Uri, context: Context): String? {
     return try {

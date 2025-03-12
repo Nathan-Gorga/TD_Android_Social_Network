@@ -9,5 +9,6 @@ data class Article(
     val date: String = "",
     val likes: Int = 0,
     var comments: Map<String, Comment>? = emptyMap(),
+    val userId: String = "",
+    val username: String = ""
 )
-

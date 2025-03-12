@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import fr.isen.nathangorga.tdandroid_socialnetwork.model.Comment
 
@@ -26,6 +27,7 @@ fun CommentScreen(articleId: String, navController: NavHostController) {
     val databaseRef = FirebaseDatabase.getInstance().getReference("articles/$articleId/comments")
     val comments = remember { mutableStateListOf<Comment>() }
     var commentText by remember { mutableStateOf("") }
+    val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
     // 🔄 Récupération des commentaires en temps réel depuis Firebase
     LaunchedEffect(Unit) {
@@ -37,11 +39,9 @@ fun CommentScreen(articleId: String, navController: NavHostController) {
                     comment?.let { comments.add(it) }
                 }
             }
-
             override fun onCancelled(error: DatabaseError) {}
         })
     }
-
 
     Column(
         modifier = Modifier
@@ -100,7 +100,6 @@ fun CommentScreen(articleId: String, navController: NavHostController) {
             )
         )
 
-
         Spacer(modifier = Modifier.height(8.dp))
 
         // 📩 Bouton pour envoyer le commentaire
@@ -110,7 +109,7 @@ fun CommentScreen(articleId: String, navController: NavHostController) {
                     val newComment = Comment(
                         id = databaseRef.push().key ?: "",
                         content = commentText,
-                        //userId = "utilisateur_exemple", // Remplace par l'ID utilisateur
+                        userId = currentUserId, // ✅ Récupérer l'ID de l'utilisateur connecté
                         date = System.currentTimeMillis().toString()
                     )
                     newComment.id?.let { databaseRef.child(it).setValue(newComment) }
@@ -129,6 +128,20 @@ fun CommentScreen(articleId: String, navController: NavHostController) {
 // 🔹 Élément d'affichage pour chaque commentaire (design cohérent avec `FeedScreen`)
 @Composable
 fun CommentItem(comment: Comment) {
+    var username by remember { mutableStateOf("Utilisateur inconnu") }
+    val userProfileRef = FirebaseDatabase.getInstance().getReference("users").child(comment.userId ?: "")
+
+    LaunchedEffect(comment.userId) {
+        if (!comment.userId.isNullOrEmpty()) {
+            userProfileRef.get().addOnSuccessListener { snapshot ->
+                val userProfile = snapshot.getValue(UserProfile::class.java)
+                username = userProfile?.username ?: "Utilisateur inconnu"
+            }.addOnFailureListener {
+                println("Erreur lors de la récupération du username : ${it.message}")
+            }
+        }
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -143,6 +156,14 @@ fun CommentItem(comment: Comment) {
                 .background(Color(0xFFB3E5FC), shape = RoundedCornerShape(12.dp)) // 🔵 Fond bleu doux
                 .padding(12.dp)
         ) {
+            // 🔹 Affichage du username
+            Text(
+                text = username,
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp,
+                color = Color.Black
+            )
+            Spacer(modifier = Modifier.height(4.dp))
             comment.content?.let {
                 Text(
                     text = it,
