@@ -20,6 +20,9 @@ import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import fr.isen.nathangorga.tdandroid_socialnetwork.model.Comment
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -106,17 +109,22 @@ fun CommentScreen(articleId: String, navController: NavHostController) {
         Button(
             onClick = {
                 if (commentText.isNotBlank()) {
+                    val formatter = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                    val formattedDate = formatter.format(Date(System.currentTimeMillis()))
+
                     val newComment = Comment(
                         id = databaseRef.push().key ?: "",
                         content = commentText,
-                        userId = currentUserId, // ✅ Récupérer l'ID de l'utilisateur connecté
-                        date = System.currentTimeMillis().toString()
+                        userId = currentUserId, // ✅ Assurez-vous que currentUserId est bien défini
+                        date = formattedDate // ✅ Date formatée proprement
                     )
+
                     newComment.id?.let { databaseRef.child(it).setValue(newComment) }
-                    commentText = ""
+                    commentText = "" // ✅ Réinitialisation après envoi
                 }
             },
-            modifier = Modifier
+
+                    modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp)) // 🔹 Style arrondi
         ) {
