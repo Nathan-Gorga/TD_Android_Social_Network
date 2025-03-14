@@ -15,6 +15,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
@@ -207,19 +210,66 @@ fun ProfileScreen(navController: NavHostController, userId: String) {
         Spacer(modifier = Modifier.height(20.dp))
 
         // **Section Articles de l'utilisateur**
-        Text("Mes Articles De Qualités", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+        Text(
+            text = "Publications",
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp,
+            modifier = Modifier.padding(vertical = 10.dp)
+        )
 
-        Spacer(modifier = Modifier.height(10.dp))
-
-        userArticles.forEach { article ->
-            Card(
-                modifier = Modifier.fillMaxWidth().padding(8.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(4.dp)
+        if (userArticles.isEmpty()) {
+            Text(
+                text = "Aucune publication pour l'instant.",
+                fontSize = 16.sp,
+                color = Color.Gray,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+        } else {
+            LazyColumn(
+                modifier = Modifier.weight(1f) // ✅ Permet de scroller sans cacher le bouton
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(article.text, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                items(userArticles) { article ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        elevation = CardDefaults.cardElevation(4.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                text = article.text,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            if (!article.imageUrl.isNullOrEmpty()) {
+                                val bitmap = decodeBase64ToBitmap(article.imageUrl!!)
+                                bitmap?.let {
+                                    Image(
+                                        painter = rememberAsyncImagePainter(it),
+                                        contentDescription = "Image de l'article",
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(200.dp)
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .background(Color.Gray),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                }
+                            }
+
+                            Text(
+                                text = "Publié le : ${article.date}",
+                                fontSize = 12.sp,
+                                color = Color.Gray
+                            )
+                        }
+                    }
                 }
             }
         }
