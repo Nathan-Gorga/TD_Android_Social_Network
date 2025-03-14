@@ -72,6 +72,7 @@ fun PublishScreen(navController: NavHostController) {
             ) {
                 Text(
                     text = "✏\uFE0F Publie un article ✏\uFE0F",
+
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,

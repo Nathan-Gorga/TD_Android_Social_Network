@@ -67,11 +67,13 @@ fun SearchUserScreen(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+
             .background(Color(0xFFB3E5FC)) // ✅ Fond bleu ciel appliqué
             .padding(16.dp)
     ) {
         // 📌 Titre dans un rectangle bleu foncé
         Card(
+
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 12.dp),
@@ -143,7 +145,9 @@ fun UserSearchItem(user: SearchUser, navController: NavHostController) {
                 modifier = Modifier
                     .size(50.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFFB3E5FC)), // ✅ Bleu ciel pour l'image de profil
+
+                    .background(Color(0xFFB3E5FC)),
+
                 contentScale = ContentScale.Crop
             )
 
@@ -184,7 +188,9 @@ fun UserProfileScreen(userId: String, navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFB3E5FC)) // ✅ Fond bleu ciel appliqué
+
+            .background(Color(0xFFB3E5FC)) 
+
             .padding(16.dp)
     ) {
         user?.let { profile ->
@@ -239,6 +245,150 @@ fun UserProfileScreen(userId: String, navController: NavHostController) {
                                 fontSize = 12.sp,
                                 color = Color.Gray
                             )
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    // 🎨 Carte pour chaque utilisateur trouvé
+    @Composable
+    fun UserSearchItem(user: SearchUser, navController: NavHostController) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 6.dp)
+                .clickable { navController.navigate("userProfileDetail/${user.userId}") } // ✅ Ouvre une nouvelle page
+                .animateContentSize(),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+            elevation = CardDefaults.cardElevation(4.dp)
+        ) {
+            Row(
+                modifier = Modifier.padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = if (user.profilePictureBase64.isNotEmpty()) {
+                        rememberAsyncImagePainter(decodeBase64ToBitmap(user.profilePictureBase64))
+                    } else {
+                        rememberAsyncImagePainter(R.drawable.default_profile_picture)
+                    },
+                    contentDescription = "Photo de profil",
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFB3E5FC)),
+                    contentScale = ContentScale.Crop
+                )
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column {
+                    Text(
+                        text = user.username,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                    Text(text = "Voir le profil", fontSize = 14.sp, color = Color.Gray)
+                }
+            }
+        }
+    }
+
+
+    // 📌 **Profil utilisateur + Ses articles**
+    @Composable
+    fun UserProfileScreen(userId: String, navController: NavHostController) {
+        val databaseRef = FirebaseDatabase.getInstance().getReference("users").child(userId)
+        val articlesRef = FirebaseDatabase.getInstance().getReference("articles")
+
+        var user by remember { mutableStateOf<SearchUser?>(null) }
+        var userArticles by remember { mutableStateOf<List<Article>>(emptyList()) }
+
+        LaunchedEffect(userId) {
+            // Récupérer infos utilisateur
+            databaseRef.get().addOnSuccessListener { snapshot ->
+                user = snapshot.getValue(SearchUser::class.java)
+            }
+
+            // Récupérer ses articles
+            articlesRef.orderByChild("userId").equalTo(userId).get()
+                .addOnSuccessListener { snapshot ->
+                    val articlesList = mutableListOf<Article>()
+                    for (child in snapshot.children) {
+                        val article = child.getValue(Article::class.java)
+                        article?.let { articlesList.add(it) }
+                    }
+                    userArticles = articlesList
+                }
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFFF8F9FA))
+                .padding(16.dp)
+        ) {
+            user?.let { profile ->
+                // 📸 Photo + Nom + Bio
+                Image(
+                    painter = if (profile.profilePictureBase64.isNotEmpty()) {
+                        rememberAsyncImagePainter(decodeBase64ToBitmap(profile.profilePictureBase64))
+                    } else {
+                        rememberAsyncImagePainter(R.drawable.default_profile_picture)
+                    },
+                    contentDescription = "Photo de profil",
+                    modifier = Modifier
+                        .size(120.dp)
+                        .clip(CircleShape)
+                        .align(Alignment.CenterHorizontally),
+                    contentScale = ContentScale.Crop
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text(
+                    text = profile.username,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 22.sp,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+                Text(
+                    text = profile.bio,
+                    fontSize = 16.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // 📜 Liste des articles postés
+                LazyColumn {
+                    items(userArticles) { article ->
+                        Card(
+                            modifier = Modifier.fillMaxWidth().padding(8.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+                            elevation = CardDefaults.cardElevation(4.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text(
+                                    text = article.text,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                Text(
+                                    text = "Publié le : ${article.date}",
+                                    fontSize = 12.sp,
+                                    color = Color.Gray
+                                )
+                            }
+
                         }
                     }
                 }
