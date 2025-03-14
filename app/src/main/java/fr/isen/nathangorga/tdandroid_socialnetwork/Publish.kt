@@ -35,6 +35,7 @@ import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 
 
 @RequiresApi(Build.VERSION_CODES.P)
@@ -61,13 +62,26 @@ fun PublishScreen(navController: NavHostController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
         ) {
-            // 📝 Titre de la page
-            Text(
-                text = "Créer une publication",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
+            // 📢 Bloc bleu pour "Créer une publication"
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(0.85f) // Même largeur que le titre
+                    .padding(bottom = 16.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF1976D2)) // 🔵 Bleu foncé
+            ) {
+                Text(
+                    text = "✏\uFE0F  Ecrire un truc cool ✏\uFE0F",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    modifier = Modifier
+                        .padding(vertical = 12.dp)
+                        .fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            }
+
             Spacer(modifier = Modifier.height(20.dp))
 
             // Zone de texte

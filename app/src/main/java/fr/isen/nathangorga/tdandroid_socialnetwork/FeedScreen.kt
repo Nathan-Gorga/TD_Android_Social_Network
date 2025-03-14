@@ -85,7 +85,9 @@ fun FeedScreen(navController: NavHostController) {
             // 📜 Liste des articles
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(10.dp) // ✅ Espacement entre les articles
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(20.dp) // ✅ Espacement entre les articles
+
             ) {
                 items(articles.reversed()) { article ->
                     ArticleCard(article, databaseRef, navController)

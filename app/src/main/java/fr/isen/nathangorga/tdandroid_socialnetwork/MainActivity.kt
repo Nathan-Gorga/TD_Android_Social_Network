@@ -24,6 +24,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
+import fr.isen.nathangorga.tdandroid_socialnetwork.chat.ChatScreen
+import fr.isen.nathangorga.tdandroid_socialnetwork.chat.InboxScreen
 import fr.isen.nathangorga.tdandroid_socialnetwork.login.LogActivity
 import fr.isen.nathangorga.tdandroid_socialnetwork.model.UserProfileDetailScreen
 import fr.isen.nathangorga.tdandroid_socialnetwork.profile.SearchUserScreen
@@ -102,6 +104,15 @@ fun AppNavigation(navController: NavHostController) {
                 composable("userProfileDetail/{userId}") { backStackEntry ->
                     val userId = backStackEntry.arguments?.getString("userId") ?: ""
                     UserProfileDetailScreen(userId, navController)
+                }
+                composable("inbox") { InboxScreen(navController) }
+                composable("chat/{userId}") { backStackEntry ->
+                    val userId = backStackEntry.arguments?.getString("userId") ?: return@composable
+                    ChatScreen(navController, userId)
+                }
+                composable("commentScreen/{articleId}") { backStackEntry ->
+                    val articleId = backStackEntry.arguments?.getString("articleId") ?: ""
+                    CommentScreen(articleId, navController)
                 }
 
 

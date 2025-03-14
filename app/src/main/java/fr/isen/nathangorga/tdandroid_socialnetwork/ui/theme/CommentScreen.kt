@@ -77,7 +77,7 @@ fun CommentScreen(articleId: String, navController: NavHostController) {
                 .fillMaxWidth()
                 .weight(1f)
                 .clip(RoundedCornerShape(12.dp))
-                .background(Color.White)
+                .background(Color(0xFFB3E5FC))
                 .padding(8.dp)
         ) {
             items(comments) { comment ->
