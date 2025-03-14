@@ -67,19 +67,30 @@ fun SearchUserScreen(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFB3E5FC)) // ✅ Fond bleu ciel
+
+            .background(Color(0xFFB3E5FC)) // ✅ Fond bleu ciel appliqué
             .padding(16.dp)
     ) {
-        Text(
-            text = "🔍 Recherche Un Papi",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF2575FC),
+        // 📌 Titre dans un rectangle bleu foncé
+        Card(
+
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 12.dp)
-                .wrapContentWidth(Alignment.CenterHorizontally)
-        )
+                .padding(bottom = 12.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1976D2)) // ✅ Fond bleu foncé
+        ) {
+            Text(
+                text = "🔍 Recherche Un Papi 🔍",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White, // ✅ Texte blanc
+                modifier = Modifier
+                    .padding(vertical = 12.dp)
+                    .fillMaxWidth(),
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+        }
 
         OutlinedTextField(
             value = searchQuery,
@@ -134,7 +145,9 @@ fun UserSearchItem(user: SearchUser, navController: NavHostController) {
                 modifier = Modifier
                     .size(50.dp)
                     .clip(CircleShape)
+
                     .background(Color(0xFFB3E5FC)),
+
                 contentScale = ContentScale.Crop
             )
 
@@ -175,7 +188,9 @@ fun UserProfileScreen(userId: String, navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFB3E5FC)) // ✅ Fond bleu ciel
+
+            .background(Color(0xFFB3E5FC)) 
+
             .padding(16.dp)
     ) {
         user?.let { profile ->
@@ -230,6 +245,7 @@ fun UserProfileScreen(userId: String, navController: NavHostController) {
                                 fontSize = 12.sp,
                                 color = Color.Gray
                             )
+
                         }
                     }
                 }
@@ -372,6 +388,7 @@ fun UserProfileScreen(userId: String, navController: NavHostController) {
                                     color = Color.Gray
                                 )
                             }
+
                         }
                     }
                 }
