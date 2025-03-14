@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -32,7 +33,7 @@ fun CommentScreen(articleId: String, navController: NavHostController) {
     var commentText by remember { mutableStateOf("") }
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
-    // 🔄 Récupération des commentaires en temps réel depuis Firebase
+    // 🔄 Récupération des commentaires depuis Firebase
     LaunchedEffect(Unit) {
         databaseRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -49,11 +50,11 @@ fun CommentScreen(articleId: String, navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-            .background(Color(0xFFF8F9FA)), // 🔹 Fond doux
+            .background(Color(0xFFF0F0F0))
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 🔙 Titre avec bouton retour
+        // 🔙 Barre supérieure avec bouton retour
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -61,7 +62,7 @@ fun CommentScreen(articleId: String, navController: NavHostController) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = { navController.popBackStack() }) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Retour")
+                Icon(Icons.Default.ArrowBack, contentDescription = "Retour", tint = Color.Black)
             }
             Text(
                 text = "💬 Commentaires",
@@ -70,12 +71,12 @@ fun CommentScreen(articleId: String, navController: NavHostController) {
             )
         }
 
-        // 📜 Affichage des commentaires
+        // 📜 Liste des commentaires
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .clip(RoundedCornerShape(12.dp)) // 🔹 Arrondi pour style
+                .clip(RoundedCornerShape(12.dp))
                 .background(Color.White)
                 .padding(8.dp)
         ) {
@@ -86,26 +87,26 @@ fun CommentScreen(articleId: String, navController: NavHostController) {
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // 📝 Champ pour écrire un commentaire
+        // 📝 Champ de texte pour écrire un commentaire
         OutlinedTextField(
             value = commentText,
             onValueChange = { commentText = it },
             label = { Text("Ajouter un commentaire...") },
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp)), // 🔹 Arrondi
+                .clip(RoundedCornerShape(12.dp)),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFFB3E5FC), // 🔵 Bleu clair
+                focusedBorderColor = Color(0xFF64B5F6),
                 unfocusedBorderColor = Color.Gray,
-                cursorColor = Color(0xFFB3E5FC), // 🔵 Curseur
-                focusedLabelColor = Color(0xFFB3E5FC),
+                cursorColor = Color(0xFF64B5F6),
+                focusedLabelColor = Color(0xFF64B5F6),
                 unfocusedLabelColor = Color.Gray
             )
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // 📩 Bouton pour envoyer le commentaire
+        // 📩 Bouton d'envoi du commentaire
         Button(
             onClick = {
                 if (commentText.isNotBlank()) {
@@ -126,14 +127,15 @@ fun CommentScreen(articleId: String, navController: NavHostController) {
 
                     modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp)) // 🔹 Style arrondi
+                .clip(RoundedCornerShape(12.dp)),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2))
         ) {
-            Text("Envoyer", fontWeight = FontWeight.Bold)
+            Text("Envoyer", fontWeight = FontWeight.Bold, color = Color.White)
         }
     }
 }
 
-// 🔹 Élément d'affichage pour chaque commentaire (design cohérent avec `FeedScreen`)
+// 🔹 Élément d'affichage pour chaque commentaire
 @Composable
 fun CommentItem(comment: Comment) {
     var username by remember { mutableStateOf("Utilisateur inconnu") }
@@ -161,7 +163,7 @@ fun CommentItem(comment: Comment) {
         Column(
             modifier = Modifier
                 .padding(12.dp)
-                .background(Color(0xFFB3E5FC), shape = RoundedCornerShape(12.dp)) // 🔵 Fond bleu doux
+                .background(Color(0xFF64B5F6), shape = RoundedCornerShape(12.dp))
                 .padding(12.dp)
         ) {
             // 🔹 Affichage du username

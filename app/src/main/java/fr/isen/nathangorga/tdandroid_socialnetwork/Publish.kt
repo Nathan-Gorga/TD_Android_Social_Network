@@ -10,8 +10,7 @@ import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,9 +18,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -35,6 +34,8 @@ import fr.isen.nathangorga.tdandroid_socialnetwork.models.Article
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.compose.ui.text.font.FontWeight
+
 
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,7 +53,7 @@ fun PublishScreen(navController: NavHostController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF0F0F0)) // Fond gris clair
+            .background(Color(0xFFB3E5FC)) // 🔵 Fond bleu clair (même couleur que la navbar)
             .padding(20.dp),
         contentAlignment = Alignment.TopCenter
     ) {
@@ -60,9 +61,11 @@ fun PublishScreen(navController: NavHostController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
         ) {
+            // 📝 Titre de la page
             Text(
-                "Publier un message",
-                style = MaterialTheme.typography.headlineMedium.copy(fontSize = 24.sp),
+                text = "Créer une publication",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
                 color = Color.Black
             )
             Spacer(modifier = Modifier.height(20.dp))
@@ -80,52 +83,61 @@ fun PublishScreen(navController: NavHostController) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Image sélectionnée + bouton pour ajouter une photo
-            Box(
+            // 🖼️ Aperçu de l'image sélectionnée
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(Color.White),
-                contentAlignment = Alignment.Center
+                    .height(250.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(6.dp),
+                shape = RoundedCornerShape(16.dp) // 🔵 Coins arrondis
             ) {
-                if (imageUri != null) {
-                    Image(
-                        painter = rememberAsyncImagePainter(imageUri),
-                        contentDescription = "Image sélectionnée",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    IconButton(
-                        onClick = { imagePickerLauncher.launch("image/*") },
-                        modifier = Modifier
-                            .size(60.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFF64B5F6))
-                    ) {
-                        Icon(Icons.Default.AddAPhoto, contentDescription = "Ajouter une image", tint = Color.White)
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (imageUri != null) {
+                        Image(
+                            painter = rememberAsyncImagePainter(imageUri),
+                            contentDescription = "Image sélectionnée",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        IconButton(
+                            onClick = { imagePickerLauncher.launch("image/*") },
+                            modifier = Modifier
+                                .size(80.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    Brush.linearGradient(
+                                        listOf(Color(0xFF42A5F5), Color(0xFF1976D2))
+                                    )
+                                )
+                        ) {
+                            Icon(Icons.Default.AddAPhoto, contentDescription = "Ajouter une image", tint = Color.White, modifier = Modifier.size(40.dp))
+                        }
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Bouton publier
+            // 📩 Bouton de publication stylisé
             Button(
                 onClick = {
                     isLoading = true
                     if (imageUri != null) {
-                        postArticle(text, imageUri!!, navController, context) // Avec image
+                        postArticle(text, imageUri!!, navController, context)
                     } else {
-                        postArticle(text, null, navController, context) // Juste du texte
+                        postArticle(text, null, navController, context)
                     }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(60.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2))
+                    .height(55.dp)
+                    .clip(RoundedCornerShape(12.dp)), // 🔵 Bouton arrondi
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E88E5)) // 🔵 Bleu vif
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(color = Color.White)
@@ -184,12 +196,13 @@ fun postArticle(text: String, imageUri: Uri?, navController: NavHostController, 
     val article = Article(
         id = databaseRef.push().key ?: "",
         text = text,
-        imageUrl = imageBase64, // Stockage en Base64
+        imageUrl = imageBase64,
         date = formattedDate,
         userId = currentUserId // 🔥 Enregistrer l'ID de l'utilisateur 🔥
     )
 
     databaseRef.child(article.id).setValue(article).addOnCompleteListener {
+        navController.navigate("journal") // 🔄 Redirection après publication
         println("✅ Article publié avec succès : ${article.id}")
         navController.navigate("journal") // Redirection après publication
     }.addOnFailureListener {
