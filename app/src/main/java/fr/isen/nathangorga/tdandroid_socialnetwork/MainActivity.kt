@@ -103,6 +103,10 @@ fun AppNavigation(navController: NavHostController) {
                     val userId = backStackEntry.arguments?.getString("userId") ?: ""
                     UserProfileDetailScreen(userId, navController)
                 }
+                composable("commentScreen/{articleId}") { backStackEntry ->
+                    val articleId = backStackEntry.arguments?.getString("articleId") ?: ""
+                    CommentScreen(articleId, navController)
+                }
 
 
             composable("profile/{userId}") { backStackEntry ->
