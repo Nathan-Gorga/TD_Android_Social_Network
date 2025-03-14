@@ -193,7 +193,7 @@ fun ArticleCard(article: Article, databaseRef: DatabaseReference, navController:
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Rédigé le : ${article.date}",
+                    text = "${article.date}",
                     fontSize = 12.sp,
                     color = Color.Gray
                 )
