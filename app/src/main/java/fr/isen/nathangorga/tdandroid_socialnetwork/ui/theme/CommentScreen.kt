@@ -33,7 +33,7 @@ fun CommentScreen(articleId: String, navController: NavHostController) {
     var commentText by remember { mutableStateOf("") }
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
-    // 🔄 Récupération des commentaires depuis Firebase
+    // Récupération des commentaires depuis Firebase
     LaunchedEffect(Unit) {
         databaseRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -54,7 +54,7 @@ fun CommentScreen(articleId: String, navController: NavHostController) {
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 🔙 Barre supérieure avec bouton retour
+        // Barre supérieure avec bouton retour
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -71,13 +71,13 @@ fun CommentScreen(articleId: String, navController: NavHostController) {
             )
         }
 
-        // 📜 Liste des commentaires
+        // Liste des commentaires
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
                 .clip(RoundedCornerShape(12.dp))
-                .background(Color.White)
+                .background(Color(0xFFB3E5FC))
                 .padding(8.dp)
         ) {
             items(comments) { comment ->
@@ -87,7 +87,7 @@ fun CommentScreen(articleId: String, navController: NavHostController) {
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // 📝 Champ de texte pour écrire un commentaire
+        // Champ de texte pour écrire un commentaire
         OutlinedTextField(
             value = commentText,
             onValueChange = { commentText = it },
@@ -106,7 +106,7 @@ fun CommentScreen(articleId: String, navController: NavHostController) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // 📩 Bouton d'envoi du commentaire
+        // Bouton d'envoi du commentaire
         Button(
             onClick = {
                 if (commentText.isNotBlank()) {
@@ -135,7 +135,7 @@ fun CommentScreen(articleId: String, navController: NavHostController) {
     }
 }
 
-// 🔹 Élément d'affichage pour chaque commentaire
+// Élément d'affichage pour chaque commentaire
 @Composable
 fun CommentItem(comment: Comment) {
     var username by remember { mutableStateOf("Utilisateur inconnu") }
@@ -166,7 +166,7 @@ fun CommentItem(comment: Comment) {
                 .background(Color(0xFF64B5F6), shape = RoundedCornerShape(12.dp))
                 .padding(12.dp)
         ) {
-            // 🔹 Affichage du username
+            // Affichage du username
             Text(
                 text = username,
                 fontWeight = FontWeight.Bold,
