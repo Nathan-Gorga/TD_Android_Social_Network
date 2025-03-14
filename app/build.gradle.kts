@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "fr.isen.nathangorga.tdandroid_socialnetwork"
-        minSdk = 24
+        minSdk = 28
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -51,13 +51,12 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
+
     implementation(libs.androidx.ui)
     implementation(libs.androidx.material.icons.extended)
     implementation("io.coil-kt:coil-compose:2.1.0")
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.runtime.android)
     //implementation(libs.androidx.navigation.runtime.desktop)
     implementation(libs.androidx.navigation.compose)
@@ -66,6 +65,8 @@ dependencies {
     implementation(libs.protolite.well.known.types)
     implementation(libs.firebase.common.ktx)
     implementation(libs.support.annotations)
+    implementation(libs.androidx.material3.v120)
+    implementation(libs.androidx.ui.tooling.preview.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -76,5 +77,8 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.coil.compose)
     implementation(libs.androidx.activity.compose.v182)
+    implementation("androidx.compose.material3:material3:1.1.2") // Remplace par la dernière version
+
+
 
 }

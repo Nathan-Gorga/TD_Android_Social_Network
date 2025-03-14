@@ -3,43 +3,35 @@ package fr.isen.nathangorga.tdandroid_socialnetwork.profile
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.net.Uri
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil.compose.rememberImagePainter
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import fr.isen.nathangorga.tdandroid_socialnetwork.R
 import fr.isen.nathangorga.tdandroid_socialnetwork.login.LogActivity
-import fr.isen.nathangorga.tdandroid_socialnetwork.ui.theme.DarkBlue
+import androidx.compose.ui.tooling.preview.Preview
 import fr.isen.nathangorga.tdandroid_socialnetwork.ui.theme.TDAndroidSocialNetworkTheme
 
 class ProfileEditActivity : ComponentActivity() {
@@ -57,115 +49,152 @@ class ProfileEditActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(28)
 @Composable
-fun ProfileEditScreen(userId: String) { // Pass context as a parameter
-    //TODO: remplacer fake user par un user de firebase
-    //À SUPPRIMER CE BLOC
-    val user = UserProfile.getFakeUser()
+fun ProfileEditScreen(userId: String) {
+    val user = UserProfile.getFakeUser() // Fake user (à remplacer par Firebase)
+    val context = LocalContext.current
 
-    val pfp = remember { mutableIntStateOf(R.drawable.ic_launcher_foreground) }
+    var username by remember { mutableStateOf(user.username) }
+    var bio by remember { mutableStateOf("Décrivez-vous ici...") }
+    var isEditing by remember { mutableStateOf(false) }
+
+    // Image de profil
     val imageMap = mapOf(
         "default_profile_picture.png" to R.drawable.default_profile_picture,
         "pfp_jean.png" to R.drawable.pfp_jean
     )
-    pfp.intValue = imageMap[user.profilePictureName] ?: R.drawable.ic_launcher_foreground
+    val profilePicture = imageMap[user.profilePictureName] ?: R.drawable.default_profile_picture
 
-    val profilePicture by remember { mutableIntStateOf(pfp.intValue) }
-    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
+            .background(Color.White)
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Profil de l'utilisateur : $userId")
+        Spacer(modifier = Modifier.height(16.dp))
+
         // Bouton de déconnexion en haut à droite
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.End
         ) {
             Button(
-                onClick = { logout(context = context) }, // Pass context to fr.isen.nathangorga.tdandroid_socialnetwork.profile.Logout
-                modifier = Modifier.padding(8.dp)
+                onClick = { logout(context) },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
+                shape = RoundedCornerShape(8.dp)
             ) {
-                Text("Déconnexion")
+                Text("Déconnexion", color = Color.White, fontSize = 14.sp)
             }
         }
 
-        Image(
-            painter = painterResource(id = profilePicture),
-            contentDescription = "Photo de profil",
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Photo de profil + infos utilisateur à droite
+        Row(
             modifier = Modifier
-                .size(100.dp)
-                .clickable { /* Ajouter logique de changement image */ },
-            contentScale = ContentScale.Crop
-        )
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(CircleShape)
+                    .border(3.dp, Color.Gray, CircleShape)
+                    .clickable { /* TODO: Ajouter modification de la photo */ },
+                contentAlignment = Alignment.BottomEnd
+            ) {
+                Image(
+                    painter = painterResource(id = profilePicture),
+                    contentDescription = "Photo de profil",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+
+                IconButton(
+                    onClick = { /* TODO: Modifier la photo de profil */ },
+                    modifier = Modifier
+                        .size(36.dp)
+                        .background(Color.White, CircleShape)
+                        .border(2.dp, Color.Gray, CircleShape)
+                ) {
+                    Icon(Icons.Filled.Edit, contentDescription = "Modifier", tint = Color.Black)
+                }
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column(
+                verticalArrangement = Arrangement.Center
+            ) {
+                if (isEditing) {
+                    OutlinedTextField(
+                        value = username,
+                        onValueChange = { username = it },
+                        label = { Text("Nom d'utilisateur") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else {
+                    Text(
+                        text = username,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 22.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                if (isEditing) {
+                    OutlinedTextField(
+                        value = bio,
+                        onValueChange = { bio = it },
+                        label = { Text("Bio") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else {
+                    Text(
+                        text = bio,
+                        fontSize = 16.sp,
+                        color = Color.Gray
+                    )
+                }
+            }
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        CustomTextField("Nom d'utilisateur", initialValue = user.username)
-        Spacer(modifier = Modifier.height(8.dp))
-
-        CustomTextField("Courriel", initialValue = user.email)
-        Spacer(modifier = Modifier.height(8.dp))
-
-        CustomTextField("Prénom", initialValue = user.firstName)
-        Spacer(modifier = Modifier.height(8.dp))
-
-        CustomTextField("Nom", initialValue = user.lastName)
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(onClick = { /* Sauvegarder les modifications */ }) {
-            Text("Enregistrer")
+        // Bouton Modifier le profil
+        Button(
+            onClick = { isEditing = !isEditing },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2))
+        ) {
+            Text(if (isEditing) "Enregistrer" else "Modifier le profil", fontSize = 18.sp, color = Color.White)
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CustomTextField(label: String, initialValue: String) {
-    var text by remember { mutableStateOf(initialValue) }
-    var isFocused by remember { mutableStateOf(false) }
-
-    OutlinedTextField(
-        value = text,
-        onValueChange = { text = it },
-        label = { Text(label) },
-        colors = TextFieldDefaults.colors( // Remplace outlinedTextFieldColors() par colors()
-            focusedIndicatorColor = DarkBlue, // Bordure quand focus
-            unfocusedIndicatorColor = Color.Gray, // Bordure quand pas focus
-            focusedLabelColor = DarkBlue, // Couleur du label quand focus
-            unfocusedLabelColor = Color.Gray // Couleur du label sans focus
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .onFocusChanged { focusState ->
-                if (focusState.isFocused) {
-                    if (!isFocused && (initialValue == text)) {
-                        text = ""
-                    }
-                    isFocused = true
-                } else {
-                    if (text.isBlank()) {
-                        text = initialValue
-                    }
-                    isFocused = false
-                }
-            }
-    )
-}
-
+/**
+ * Fonction de déconnexion et redirection vers l'écran de connexion.
+ */
 fun logout(context: Context) {
     FirebaseAuth.getInstance().signOut()
-
-    // Rediriger vers l'écran de connexion
     val intent = Intent(context, LogActivity::class.java)
-    intent.flags =
-        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK // Empêche de revenir en arrière avec le bouton retour
+    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
     context.startActivity(intent)
 }
 
+/**
+ * Prévisualisation du design du profil.
+ */
 @Preview(showBackground = true)
 @Composable
 fun PreviewProfileEditScreen() {

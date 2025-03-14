@@ -52,26 +52,44 @@ fun FeedScreen(navController: NavHostController) {
         })
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF8F9FA))
-            .padding(top = 16.dp)
+            .background(Color(0xFFB3E5FC)) // 🔵 Fond bleu clair (comme PublishScreen)
+            .padding(16.dp)
     ) {
-        Text(
-            text = "📢 Mon Journal 📢",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-        )
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // 📢 Titre du journal avec un cadre bleu
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(0.85f)
+                    .padding(bottom = 16.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF1976D2)) // 🔵 Bleu foncé
+            ) {
+                Text(
+                    text = "📢 Mon Journal 📢",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    modifier = Modifier
+                        .padding(vertical = 12.dp)
+                        .fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            }
 
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(articles.reversed()) { article ->
-                ArticleCard(article, databaseRef, navController)
-                Spacer(modifier = Modifier.height(10.dp))
+            // 📜 Liste des articles
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(10.dp) // ✅ Espacement entre les articles
+            ) {
+                items(articles.reversed()) { article ->
+                    ArticleCard(article, databaseRef, navController)
+                }
             }
         }
     }
@@ -111,7 +129,7 @@ fun ArticleCard(article: Article, databaseRef: DatabaseReference, navController:
 
     Card(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth(0.9f) // ✅ Centré et moins large
             .padding(horizontal = 16.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -147,6 +165,7 @@ fun ArticleCard(article: Article, databaseRef: DatabaseReference, navController:
 
             Spacer(modifier = Modifier.height(10.dp))
 
+            // 🖼️ Affichage de l'image si disponible
             article.imageUrl?.let { imageBase64 ->
                 val decodedBytes = Base64.decode(imageBase64, Base64.DEFAULT)
                 val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
@@ -165,6 +184,7 @@ fun ArticleCard(article: Article, databaseRef: DatabaseReference, navController:
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // 🕒 Informations et actions (date + like)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
