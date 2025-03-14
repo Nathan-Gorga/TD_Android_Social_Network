@@ -71,7 +71,7 @@ fun PublishScreen(navController: NavHostController) {
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF1976D2)) // 🔵 Bleu foncé
             ) {
                 Text(
-                    text = "✏\uFE0F  Ecrire un truc cool ✏\uFE0F",
+                    text = "✏\uFE0F Publie un article ✏\uFE0F",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,

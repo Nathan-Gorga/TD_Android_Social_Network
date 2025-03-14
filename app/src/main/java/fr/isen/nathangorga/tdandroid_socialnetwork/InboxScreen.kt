@@ -35,7 +35,7 @@ fun InboxScreen(navController: NavHostController) {
     var conversations by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var userNames by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
 
-    // Charger les conversations
+    // Charger uniquement les messages **REÇUS**
     LaunchedEffect(userId) {
         messagesRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -44,18 +44,18 @@ fun InboxScreen(navController: NavHostController) {
 
                 for (child in snapshot.children) {
                     val message = child.getValue(Message::class.java)
-                    if (message != null) {
-                        val otherUserId = if (message.senderId == userId) message.receiverId else message.senderId
-                        if (!conversationMap.containsKey(otherUserId)) {
-                            conversationMap[otherUserId] = message.text
+                    if (message != null && message.receiverId == userId) { // ✅ Filtre : Seulement les messages reçus
+                        val senderId = message.senderId
+                        if (!conversationMap.containsKey(senderId)) {
+                            conversationMap[senderId] = message.text
                         }
-                        userIds.add(otherUserId)
+                        userIds.add(senderId)
                     }
                 }
 
                 conversations = conversationMap
 
-                // Récupérer les noms des utilisateurs concernés
+                // Récupérer les noms des utilisateurs qui ont envoyé un message
                 userIds.forEach { uid ->
                     usersRef.child(uid).get().addOnSuccessListener { userSnapshot ->
                         val username = userSnapshot.child("username").value as? String ?: "Utilisateur inconnu"
@@ -74,21 +74,26 @@ fun InboxScreen(navController: NavHostController) {
             .background(Color(0xFFE3F2FD)) // ✅ Fond bleu clair
             .padding(16.dp)
     ) {
-        Text(text = "Messages privés", fontSize = 22.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(8.dp))
+        Text(
+            text = "📩 Messages reçus",
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(8.dp)
+        )
 
         LazyColumn {
-            items(conversations.entries.toList()) { (otherUserId, lastMessage) ->
+            items(conversations.entries.toList()) { (senderId, lastMessage) -> // ✅ Affiche uniquement les messages reçus
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)
-                        .clickable { navController.navigate("chat/$otherUserId") },
+                        .clickable { navController.navigate("chat/$senderId") },
                     shape = RoundedCornerShape(12.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {
                         Text(
-                            text = userNames[otherUserId] ?: "Chargement...",
+                            text = userNames[senderId] ?: "Chargement...",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )
