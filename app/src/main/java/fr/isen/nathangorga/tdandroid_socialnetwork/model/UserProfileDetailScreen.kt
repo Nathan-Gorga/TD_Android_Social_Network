@@ -61,7 +61,7 @@ fun UserProfileDetailScreen(userId: String, navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(Color(0xFFB3E5FC)) // ✅ Fond bleu ciel
             .padding(16.dp)
     ) {
         user?.let { profile ->
